@@ -35,5 +35,5 @@ def test_correct_source_code():
 def test_macro_underscore():
     """Ensure that macros don't start with underscores."""
     assert_has_error("#define __FOO__",
-                     "Macro `__FOO__` should not start with an underscore")
+                     "Macro '__FOO__' should not start with an underscore")
     assert_no_error("#define BAR")
