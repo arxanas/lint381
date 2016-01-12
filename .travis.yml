@@ -15,3 +15,12 @@ after_success:
 script:
   - py.test
   - flake8 lint381 test
+
+deploy:
+  provider: pypi
+  user: arxanas
+  password:
+    secure: gwok2wRxwoT4cVX0/krSlGmqfvLLefHUqTDNAu+mh/HMdX516DChU2TxtFsYdU1n0jW+crRTzZH/UmgAd+R5iX34H6DOQKwiMRqUn1GjVJD7jRWvlz3/t+aU3/vh2gbxPH21QMAfQOiWKkfnlNybpQsmbJSFZN7bVn+Qkp+n/mnR/5k0v4RGGeL0uQPWmmsgmKWhUM3S7mzZFz2Hyyn1HPrpJLyUa39X72VgCLu2gopwVhFrpnisSnu6KUIpr1Eox4iJESBTDkwb+J1GDaCzJp8Rcq4zYltzN1cjFCq/BnwrJl6tr8mU+8eeXBh5+C4/WEL1now1CcHHP0SjgOUlnyt99jlky36xDdS3kl2lcbakgPMZSLnOPrIe0GO/n16bpPMJJOctlMvOuX7pZAaaSmZbUlTHNYd+ucWaOpKF14+7OkA6WWBnRQeYAj9yZf4JOyJKhQM7kucLrvQ0UbXGhhreX9xR0bpsZqachWSPgIHXvZHo03crBAi5XWWpddqT5e9f+VBlff8REA4nUpwSJgvfDqYTkdvOpYxRSNXAOY0Xx17ZUL+yPY743M2dkQAcTSoR+oV0f9uMxiv3FI02k6ECbAknEfzXn7Ecpu0mnLTzlY8Fke0Vi490pmIjlGWBvYLTT8VNp+ONwermUEymLtrSwrlqlgWXxL0q0Of51Mc=
+  on:
+    distributions: sdist
+    repo: arxanas/lint381
