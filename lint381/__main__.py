@@ -13,22 +13,28 @@ def main(files):
     # TODO: Select at runtime with the --c and --cpp flags.
     linter = c_linter
 
+    had_errors = False
     for file in files:
-        lines = file.read().splitlines()
-        errors = linter.lint(lines)
+        code = file.read()
+        errors = linter.lint(code)
+        if errors:
+            had_errors = True
 
-        for line_num, errors in sorted(errors.items()):
-            # 1-index the line number.
-            line_num = line_num + 1
+        for error in errors:
+            location = error.tokens[0].start
 
-            for error_message in errors:
-                filename = os.path.basename(file.name)
-                message = ""
-                message += click.style("{}:{}: "
-                                       .format(filename, line_num),
-                                       bold=True)
-                message += click.style("error: ",
-                                       fg="red",
-                                       bold=True)
-                message += error_message
-                click.echo(message)
+            filename = os.path.basename(file.name)
+            message = ""
+            message += click.style("{filename}:{row}:{column}: "
+                                   .format(filename=filename,
+                                           row=location.row + 1,
+                                           column=location.column + 1),
+                                   bold=True)
+            message += click.style("error: ",
+                                   fg="red",
+                                   bold=True)
+            message += error.message
+            click.echo(message)
+
+    if had_errors:
+        raise SystemExit(1)

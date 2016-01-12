@@ -18,7 +18,7 @@ def source_code_files(language):
 
     tests = []
     for i in os.listdir(integ_test_dir):
-        if i.endswith(".out"):
+        if not i.endswith(".c"):
             continue
 
         input_filename = os.path.join(integ_test_dir, i)
@@ -37,4 +37,7 @@ def test_integ(language, input, output):
     runner = CliRunner()
     result = runner.invoke(main, [input])
     with open(output) as f:
-        assert result.output == f.read()
+        expected_output = f.read()
+        assert result.output == expected_output
+        if expected_output:
+            assert result.exit_code != 0

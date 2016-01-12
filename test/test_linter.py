@@ -6,16 +6,20 @@ def test_linter():
     """Ensure that the linter registers and applies all linting functions."""
     linter = Linter()
 
-    @linter.register
-    def foo(window):
-        if window.line_num == 0:
-            return "foo"
+    caught_foo = False
 
     @linter.register
-    def bar(window):
-        return "bar"
+    def foo(tokens):
+        nonlocal caught_foo
+        if not caught_foo:
+            caught_foo = True
+            yield "foo"
 
-    assert linter.lint(["foo", "bar"]) == {
-        0: ["foo", "bar"],
-        1: ["bar"],
-    }
+    @linter.register
+    def bar(tokens):
+        yield "bar"
+
+    assert list(linter.lint("code")) == [
+        "foo",
+        "bar",
+    ]

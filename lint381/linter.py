@@ -4,22 +4,16 @@ import collections
 from .code import tokenize
 
 
-class Window(collections.namedtuple("Window", ["lines", "line_num"])):
-    """A window onto a segment of the source code.
+Error = collections.namedtuple("Error", [
+    "message",
+    "tokens",
+])
+"""A linter error.
 
-    :ivar list lines: The list of lines in the file.
-    :ivar int line_num: The line number we're currently looking at.
-    """
-
-    @property
-    def line(self):
-        """The line we're currently looking at."""
-        return self.lines[self.line_num]
-
-    @property
-    def tokens(self):
-        """The tokens in the current line."""
-        return tokenize(self.line)
+:ivar str message: The error message.
+:ivar list tokens: A list of relevant tokens, in the order that they appear in
+    the source code.
+"""
 
 
 class Linter:
@@ -47,15 +41,14 @@ class Linter:
         self._linters.append(func)
         return func
 
-    def lint(self, lines):
-        """Find linting errors on the specified lines of source code."""
-        errors = collections.defaultdict(list)
+    def lint(self, code):
+        """Find linting errors on the specified lines of source code.
 
-        for line_num, _ in enumerate(lines):
-            window = Window(lines=lines, line_num=line_num)
-            for func in self._linters:
-                error_message = func(window)
-                if error_message:
-                    errors[line_num].append(error_message)
+        :param str code: The source code.
+        """
+        errors = []
+
+        for func in self._linters:
+            errors.extend(func(tokenize(code)))
 
         return errors

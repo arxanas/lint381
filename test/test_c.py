@@ -2,23 +2,21 @@
 from lint381.c import linter
 
 
-def assert_has_error(line, error_message):
-    """Assert that the given line of source code has an error.
+def assert_has_error(code, error_message):
+    """Assert that the given source code has an error.
 
-    :param str line: The line of source code.
+    :param str code: The source code.
     :param str error_message: The expected error message.
     """
-    lines = [line]
-    assert linter.lint(lines) == {0: [error_message]}
+    assert error_message in [i.message for i in linter.lint(code)]
 
 
-def assert_no_error(line):
-    """Assert that the given line of source code doesn't have an error.
+def assert_no_error(code):
+    """Assert that the given source code doesn't have an error.
 
-    :param str line: The line of source code.
+    :param str code: The source code.
     """
-    lines = [line]
-    assert not linter.lint(lines)
+    assert not list(linter.lint(code))
 
 
 def test_correct_source_code():
@@ -28,8 +26,7 @@ def test_correct_source_code():
         return 0
     }
     """
-    lines = code.strip().splitlines()
-    assert not linter.lint(lines)
+    assert not list(linter.lint(code.strip()))
 
 
 def test_macro_underscore():
@@ -41,6 +38,6 @@ def test_macro_underscore():
 
 def test_struct_capitalized():
     """Ensure that struct names must be capitalized."""
-    assert_has_error("struct foo",
+    assert_has_error("struct foo;",
                      "Struct name 'foo' should be capitalized")
-    assert_no_error("struct Foo")
+    assert_no_error("struct Foo;")
