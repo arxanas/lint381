@@ -2,9 +2,15 @@ language: python
 python:
   - "3.3"
 
+before_install:
+  - pip install codecov
+
 install:
   - pip install -r requirements.txt
   - pip install -r requirements-dev.txt
+
+after_success:
+  - codecov
 
 script:
   - py.test
