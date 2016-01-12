@@ -14,5 +14,5 @@ def underscore_define(window):
 
     macro = match["macro"]
     if macro.startswith("_"):
-        return ("Macro `{}` should not start with an underscore"
+        return ("Macro '{}' should not start with an underscore"
                 .format(macro))
