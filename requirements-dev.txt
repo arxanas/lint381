@@ -1,0 +1,7 @@
+flake8==2.5.1
+flake8-import-order==0.6.1
+flake8-pep257==1.0.5
+
+pytest==2.8.5
+pytest-cov==2.2.0
+pytest-pythonpath==0.7
