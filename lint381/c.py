@@ -6,6 +6,17 @@ linter = Linter()
 
 
 @linter.register
+@match_tokens(start="(unsigned|float)")
+def prohibited_types(tokens, match):
+    """Flag prohibited numeric types."""
+    type = match[0]
+    typename = type.value
+    return Error(message="Prohibited type '{}'"
+                 .format(typename),
+                 tokens=[type])
+
+
+@linter.register
 @match_tokens(start="#define", lookahead=1)
 def underscore_define(tokens, match):
     """Flag #defines that start with underscores."""
