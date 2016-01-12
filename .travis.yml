@@ -13,7 +13,7 @@ after_success:
   - codecov
 
 script:
-  - py.test
+  - py.test --cov-fail-under=100
   - flake8 lint381 test
 
 deploy:
