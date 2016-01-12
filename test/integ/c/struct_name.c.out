@@ -1,0 +1,1 @@
+struct_name.c:1:8: error: Struct name 'foo' should be capitalized

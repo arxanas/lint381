@@ -1,1 +1,1 @@
-underscore_define.c:2:1: error: Macro '__FOO__' should not start with an underscore
+underscore_define.c:2:9: error: Macro '__FOO__' should not start with an underscore
