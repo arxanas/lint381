@@ -21,7 +21,7 @@ def get_requirements(requirements_filename):
 
 setup(
     name="lint381",
-    version="0.1.0",
+    version="0.2.0",
     author="Waleed Khan",
     author_email="wkhan@umich.edu",
     description="C and C++ linter for EECS 381.",
