@@ -37,3 +37,10 @@ def test_macro_underscore():
     assert_has_error("#define __FOO__",
                      "Macro '__FOO__' should not start with an underscore")
     assert_no_error("#define BAR")
+
+
+def test_struct_capitalized():
+    """Ensure that struct names must be capitalized."""
+    assert_has_error("struct foo",
+                     "Struct name 'foo' should be capitalized")
+    assert_no_error("struct Foo")

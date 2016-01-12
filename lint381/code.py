@@ -1,4 +1,5 @@
 """Tools for matching code patterns."""
+import functools
 
 
 def tokenize(string):
@@ -49,3 +50,35 @@ def match_tokens(window, pattern):
         if match:
             return match
     return None
+
+
+class with_matched_tokens:
+    """Pass the result of matching tokens to a linter."""
+
+    def __init__(self, pattern):
+        """Initialize to match the specified pattern.
+
+        See `match_tokens` for a description of the pattern format.
+
+        :param str pattern: The pattern to match tokens against.
+        """
+        self._pattern = pattern
+
+    def __call__(self, func):
+        """Send the matched tokens to the specified function.
+
+        The tokens are available in the `match` keyword argument.
+
+        :param function func: The linter function to wrap.
+        :returns function: The wrapped function.
+        """
+        @functools.wraps(func)
+        def wrapped(*args, **kwargs):
+            window = args[0]
+            match = match_tokens(window, self._pattern)
+            if not match:
+                return
+
+            kwargs["match"] = match
+            return func(*args, **kwargs)
+        return wrapped
