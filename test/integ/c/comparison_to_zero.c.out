@@ -1,0 +1,4 @@
+comparison_to_zero.c:1:9: error: Comparison to 0 should be avoided
+comparison_to_zero.c:2:9: error: Comparison to NULL should be avoided
+comparison_to_zero.c:3:9: error: Comparison to 0 should be avoided
+comparison_to_zero.c:4:9: error: Comparison to NULL should be avoided

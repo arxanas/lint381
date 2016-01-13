@@ -79,6 +79,15 @@ def test_fail_to_parse_token():
         tokenize(r"`")
 
 
+def test_tokenize_binary_operator():
+    """Ensure that binary operators don't have surrounding whitespace.
+
+    Regression test.
+    """
+    code = "foo == bar"
+    assert [i.value for i in tokenize(code)] == ["foo", "==", "bar"]
+
+
 def test_tokenize_unterminated_string_literal():
     """Ensure that we reject unterminated string literals."""
     with pytest.raises(ValueError):
@@ -92,7 +101,6 @@ def test_tokenize_backslash_string_literal():
     code = r"""
 "foo\"bar\\baz"
 """.strip()
-    print(code)
 
     assert tokenize(code) == [
         Token(value=code,

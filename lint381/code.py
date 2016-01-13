@@ -83,9 +83,10 @@ class _Tokenizer:
             == | != | >= | <= |
             && | \|\| |
             \+= | -= | \*= | /= | %= |
-            <<= | >>= | &= | \|= | \^=
-            << | >> |
-        )"""
+            <<= | >>= | &= | \|= | \^= |
+            << | >>
+        )
+        """,
 
         # Single-character tokens.
         r"""
@@ -100,7 +101,7 @@ class _Tokenizer:
             ; , .
             ? :
         ]
-        """
+        """,
     ]
     _TOKEN_PATTERNS = [re.compile(i, re.VERBOSE)
                        for i in _TOKEN_PATTERNS]
