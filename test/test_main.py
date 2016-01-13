@@ -18,7 +18,7 @@ def source_code_files(language):
 
     tests = []
     for i in os.listdir(integ_test_dir):
-        if not i.endswith(".c"):
+        if not i.endswith(".{}".format(language)):
             continue
 
         input_filename = os.path.join(integ_test_dir, i)
