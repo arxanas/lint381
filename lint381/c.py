@@ -1,12 +1,12 @@
 """C linters."""
-from .code import match_tokens
+from .code import with_matched_tokens
 from .linter import Error, Linter
 
 linter = Linter()
 
 
 @linter.register
-@match_tokens(start="^(unsigned|float)$")
+@with_matched_tokens(start="^(unsigned|float)$")
 def prohibited_types(tokens, match):
     """Flag prohibited numeric types."""
     type = match[0]
@@ -17,7 +17,7 @@ def prohibited_types(tokens, match):
 
 
 @linter.register
-@match_tokens(start="^#define$", lookahead=1)
+@with_matched_tokens(start="^#define$", lookahead=1)
 def underscore_define(tokens, match):
     """Flag #defines that start with underscores."""
     define = match[1]
@@ -29,7 +29,7 @@ def underscore_define(tokens, match):
 
 
 @linter.register
-@match_tokens(start="^#define$", lookahead=1)
+@with_matched_tokens(start="^#define$", lookahead=1)
 def uppercase_define(tokens, match):
     """Flag non-uppercase #defines."""
     define = match[1]
@@ -41,7 +41,7 @@ def uppercase_define(tokens, match):
 
 
 @linter.register
-@match_tokens(start="^(struct|enum|class)$", end="^({|;)$")
+@with_matched_tokens(start="^(struct|enum|class)$", end="^({|;)$")
 def typename_capitalized(tokens, match):
     """Flag type names that aren't capitalized."""
     type = match[0].value
@@ -53,7 +53,7 @@ def typename_capitalized(tokens, match):
 
 
 @linter.register
-@match_tokens(start="^enum$", end="^{$")
+@with_matched_tokens(start="^enum$", end="^{$")
 def enums_end_with_e(tokens, match):
     """Flag enums that don't end with '_e'."""
     enum = match[1]
@@ -65,7 +65,7 @@ def enums_end_with_e(tokens, match):
 
 
 @linter.register
-@match_tokens(start="^typedef$", end="^;$")
+@with_matched_tokens(start="^typedef$", end="^;$")
 def typedefs_end_with_t(tokens, match):
     """Flag typedefs that don't end with '_t'."""
     typedef = match[-2]

@@ -284,25 +284,15 @@ class _Tokenizer:
                      end=end_position)
 
 
-class match_tokens:
+class with_matched_tokens:
     """Pass the result of matching tokens to a linter."""
 
-    def __init__(self, *, start, end=None, lookahead=0):
+    def __init__(self, **kwargs):
         """Initialize to match a range of tokens.
 
-        :param str start: The starting token. For example, 'enum'.
-        :param str end: The ending token. For example, '}'. If not provided,
-            assumes that the ending token is the same as the starting token
-            (and therefore the result should be only one token).
-        :param int lookahead: The number of additional tokens to return beyond
-            the last one.
+        :param dict kwargs: The keyword arguments to pass to `match_tokens`.
         """
-        self._start = start
-        if end is not None:
-            self._end = end
-        else:
-            self._end = start
-        self._lookahead = lookahead
+        self._kwargs = kwargs
 
     def __call__(self, func):
         """Send the matched tokens to the decorated function.
@@ -315,40 +305,49 @@ class match_tokens:
         @functools.wraps(func)
         def wrapped(*args, **kwargs):
             tokens = args[0]
-            for match in self._match_tokens(tokens):
+            for match in match_tokens(tokens, **self._kwargs):
                 kwargs["match"] = match
                 error = func(*args, **kwargs)
                 if error:
                     yield error
         return wrapped
 
-    def _match_tokens(self, tokens):
-        """Find the specified pattern in the tokens.
 
-        :param list tokens: A sequence of tokens to find matches in.
-        :yields list: A subsequence of matched tokens.
-        """
-        i = 0
-        while i < len(tokens):
-            token = tokens[i]
-            if self._token_matches_pattern(token, self._start):
-                # Scan ahead for the matching end token.
-                for j, end_token in enumerate(tokens[i:], i):
-                    if self._token_matches_pattern(end_token, self._end):
-                        # If we can't provide enough lookahead, don't yield the
-                        # match at all.
-                        j += self._lookahead
-                        if j < len(tokens):
-                            yield tokens[i:j + 1]
-                        i = j
-                        break
-            i += 1
+def match_tokens(tokens, *, start, end=None, lookahead=0):
+    """Find the specified pattern in the tokens.
 
-    def _token_matches_pattern(self, token, pattern):
-        """Determine whether a token matches a start/end pattern.
+    :param list tokens: A sequence of tokens to find matches in.
+    :param str start: The starting pattern to match a token value against.
+    :param str end: The ending pattern to match a token value against.
+    :param int lookahead: The number of extra tokens after the ending token to
+        return.
+    :yields list: A subsequence of matched tokens.
+    """
+    if end is None:
+        end = start
 
-        :param Token token: The token.
-        :param str pattern: The start or end pattern.
-        :returns bool: Whether or not the token matches.
-        """
-        return re.match(pattern, token.value) is not None
+    i = 0
+    while i < len(tokens):
+        token = tokens[i]
+        if _token_matches_pattern(token, start):
+            # Scan ahead for the matching end token.
+            for j, end_token in enumerate(tokens[i:], i):
+                if _token_matches_pattern(end_token, end):
+                    # If we can't provide enough lookahead, don't yield the
+                    # match at all.
+                    j += lookahead
+                    if j < len(tokens):
+                        yield tokens[i:j + 1]
+                    i = j
+                    break
+        i += 1
+
+
+def _token_matches_pattern(token, pattern):
+    """Determine whether a token matches a start/end pattern.
+
+    :param Token token: The token.
+    :param str pattern: The start or end pattern.
+    :returns bool: Whether or not the token matches.
+    """
+    return re.match(pattern, token.value) is not None

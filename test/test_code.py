@@ -1,7 +1,13 @@
 """Test the code-manipulation functions."""
 import pytest
 
-from lint381.code import match_tokens, Position, Token, tokenize
+from lint381.code import (
+    match_tokens,
+    Position,
+    Token,
+    tokenize,
+    with_matched_tokens,
+)
 
 
 def test_tokenize():
@@ -146,15 +152,14 @@ foo grault bar
 foo bar
 """
 
-    @match_tokens(start="foo", end="bar")
-    def func(tokens, match):
-        return match
-
     expected = [["foo", "qux", "bar"],
                 ["foo", "grault", "bar"],
                 ["foo", "bar"]]
-    assert [[i.value for i in match]
-            for match in func(tokenize(code))] == expected
+    assert expected == [
+        [token.value for token in match]
+        for match in match_tokens(tokenize(code),
+                                  start="foo",
+                                  end="bar")]
 
 
 def test_no_matching_token():
@@ -163,11 +168,7 @@ def test_no_matching_token():
 foo
 """
 
-    @match_tokens(start="foo", end="bar")
-    def func(tokens, match):
-        return match
-
-    assert not list(func(tokenize(code)))
+    assert not list(match_tokens(tokenize(code), start="foo", end="bar"))
 
 
 def test_not_enough_lookahead():
@@ -176,8 +177,20 @@ def test_not_enough_lookahead():
 foo bar
 """
 
-    @match_tokens(start="foo", end="bar", lookahead=1)
-    def func(tokens, match):
-        return match
+    assert not list(match_tokens(tokenize(code),
+                                 start="foo",
+                                 end="bar",
+                                 lookahead=1))
 
-    assert not list(func(tokenize(code)))
+
+def test_with_matching_tokens():
+    """Ensure that we can use the decorator to match tokens."""
+    code = """
+foo bar
+"""
+
+    @with_matched_tokens(start="foo", end="bar")
+    def func(tokens, match):
+        return "baz"
+
+    assert list(func(tokenize(code))) == ["baz"]
