@@ -95,6 +95,49 @@ def test_tokenize_backslash_string_literal():
     ]
 
 
+def test_tokenize_single_line_comment():
+    """Ensure that we tokenize single-line comments correctly."""
+    assert tokenize(r"""
+struct foo;
+// this is a comment with bad code: struct foo;
+""".strip()) == [
+        Token(value="struct",
+              start=Position(row=0, column=0),
+              end=Position(row=0, column=5)),
+        Token(value="foo",
+              start=Position(row=0, column=7),
+              end=Position(row=0, column=9)),
+        Token(value=";",
+              start=Position(row=0, column=10),
+              end=Position(row=0, column=10)),
+        Token(value="// this is a comment with bad code: struct foo;",
+              start=Position(row=1, column=0),
+              end=Position(row=1, column=46)),
+    ]
+
+
+def test_tokenize_multiline_comment():
+    """Ensure that we tokenize multiline comments."""
+    assert tokenize(r"""
+foo
+/* bar
+baz */
+""".strip()) == [
+        Token(value="foo",
+              start=Position(row=0, column=0),
+              end=Position(row=0, column=2)),
+        Token(value="/* bar\nbaz */",
+              start=Position(row=1, column=0),
+              end=Position(row=2, column=5)),
+    ]
+
+
+def test_tokenize_unterminated_multiline_comment():
+    """Ensure that we reject unterminated multiline comments."""
+    with pytest.raises(ValueError):
+        tokenize("/*")
+
+
 def test_match_tokens():
     """Ensure that we match tokens correctly."""
     code = """

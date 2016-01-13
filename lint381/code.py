@@ -70,6 +70,11 @@ class _Tokenizer:
         [_a-zA-Z][_a-zA-Z0-9]+
         """,
 
+        # Single-line comment.
+        r"""
+        //.+
+        """,
+
         # Multi-character operators.
         r"""
         (
@@ -103,7 +108,7 @@ class _Tokenizer:
     def __init__(self, string):
         """Tokenize the provided code."""
         # Add a dummy whitespace character to end the last token.
-        self._string = string + " "
+        self._string = string + "\n"
         self._cursor = 0
 
         self._row = 0
@@ -158,7 +163,8 @@ class _Tokenizer:
         """
         # Special cases that we need to handle with higher priority or aren't
         # easily handled by regexes.
-        special_consumers = [self._consume_string]
+        special_consumers = [self._consume_string,
+                             self._consume_multiline_comment]
         for func in special_consumers:
             token = func()
             if token:
@@ -221,6 +227,7 @@ class _Tokenizer:
 
         start_index = self._cursor
         start_position = self._position()
+
         # Skip the current quotation mark.
         self._advance_cursor()
 
@@ -235,6 +242,41 @@ class _Tokenizer:
             self._advance_cursor()
         else:
             raise ValueError("Unterminated string literal at {}"
+                             .format(self._position().line_display))
+
+        return Token(value=self._string[start_index:end_index + 1],
+                     start=start_position,
+                     end=end_position)
+
+    def _consume_multiline_comment(self):
+        """Get a multiline comment from the stream, if possible.
+
+        :returns Token: The multiline comment, or `None` if there was no
+            multiline comment at the current position.
+        :raises ValueError: There was an unterminated multiline comment.
+        """
+        def peek_two():
+            # Note that this may result in only one character at the end of the
+            # stream, which is fine.
+            return self._string[self._cursor:self._cursor + 2]
+
+        if peek_two() != "/*":
+            return None
+
+        start_position = self._position()
+        start_index = self._cursor
+
+        while self._cursor < len(self._string):
+            if peek_two() == "*/":
+                # Move cursor to the "/".
+                self._advance_cursor()
+
+                end_index = self._cursor
+                end_position = self._position()
+                break
+            self._advance_cursor()
+        else:
+            raise ValueError("Unterminated multiline comment at {}"
                              .format(self._position().line_display))
 
         return Token(value=self._string[start_index:end_index + 1],
