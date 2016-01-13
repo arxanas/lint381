@@ -67,6 +67,12 @@ hello = "foo"
     ]
 
 
+def test_fail_to_parse_token():
+    """Ensure that we reject code with unknown tokens."""
+    with pytest.raises(ValueError):
+        tokenize(r"`")
+
+
 def test_tokenize_unterminated_string_literal():
     """Ensure that we reject unterminated string literals."""
     with pytest.raises(ValueError):

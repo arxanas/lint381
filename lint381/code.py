@@ -70,6 +70,18 @@ class _Tokenizer:
         [_a-zA-Z][_a-zA-Z0-9]+
         """,
 
+        # Multi-character operators.
+        r"""
+        (
+            :: |
+            \+\+ | -- |
+            == | != | >= | <= |
+            && | \|\| |
+            \+= | -= | \*= | /= | %= |
+            <<= | >>= | &= | \|= | \^=
+            << | >> |
+        )"""
+
         # Single-character tokens.
         r"""
         [
@@ -80,7 +92,8 @@ class _Tokenizer:
             ! ~
             + \- * / ^ % & | =
             '
-            ;
+            ; , .
+            ? :
         ]
         """
     ]
@@ -132,8 +145,6 @@ class _Tokenizer:
         """
         while self._consume_whitespace():
             token = self._get_next_token()
-            if not token:
-                return
             yield token
             self._advance_cursor()
 
@@ -157,7 +168,8 @@ class _Tokenizer:
                         for pattern in self._TOKEN_PATTERNS]
         token_values = [i for i in token_values if i]
         if not token_values:
-            return None
+            raise ValueError("Couldn't parse token at {}"
+                             .format(self._position().line_display))
 
         # Maximal munch -- pick the longest token.
         token_values.sort(key=len, reverse=True)
