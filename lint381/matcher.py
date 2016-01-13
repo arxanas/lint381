@@ -48,10 +48,10 @@ def match_tokens(tokens, *, start, end=None, lookahead=0):
     i = 0
     while i < len(tokens):
         token = tokens[i]
-        if _token_matches_pattern(token, start):
+        if start(token):
             # Scan ahead for the matching end token.
             for j, end_token in enumerate(tokens[i:], i):
-                if _token_matches_pattern(end_token, end):
+                if end(end_token):
                     # If we can't provide enough lookahead, don't yield the
                     # match at all.
                     j += lookahead
@@ -62,11 +62,12 @@ def match_tokens(tokens, *, start, end=None, lookahead=0):
         i += 1
 
 
-def _token_matches_pattern(token, pattern):
-    """Determine whether a token matches a start/end pattern.
+def match_regex(regex):
+    """Return a matcher that matches on the token's value.
 
-    :param Token token: The token.
-    :param str pattern: The start or end pattern.
-    :returns bool: Whether or not the token matches.
+    :param str regex: The regex to match the token value against.
+    :returns function: The matcher.
     """
-    return re.match(pattern, token.value) is not None
+    def matcher(token):
+        return re.match(regex, token.value) is not None
+    return matcher

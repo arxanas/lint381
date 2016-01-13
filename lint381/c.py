@@ -1,12 +1,12 @@
 """C linters."""
 from .linter import Error, Linter
-from .matcher import with_matched_tokens
+from .matcher import match_regex, with_matched_tokens
 
 linter = Linter()
 
 
 @linter.register
-@with_matched_tokens(start="^(unsigned|float)$")
+@with_matched_tokens(start=match_regex("^(unsigned|float)$"))
 def prohibited_types(tokens, *, match):
     """Flag prohibited numeric types."""
     type = match[0]
@@ -17,7 +17,7 @@ def prohibited_types(tokens, *, match):
 
 
 @linter.register
-@with_matched_tokens(start="^#define$", lookahead=1)
+@with_matched_tokens(start=match_regex("^#define$"), lookahead=1)
 def underscore_define(tokens, *, match):
     """Flag #defines that start with underscores."""
     define = match[1]
@@ -29,7 +29,7 @@ def underscore_define(tokens, *, match):
 
 
 @linter.register
-@with_matched_tokens(start="^#define$", lookahead=1)
+@with_matched_tokens(start=match_regex("^#define$"), lookahead=1)
 def uppercase_define(tokens, *, match):
     """Flag non-uppercase #defines."""
     define = match[1]
@@ -41,7 +41,8 @@ def uppercase_define(tokens, *, match):
 
 
 @linter.register
-@with_matched_tokens(start="^(struct|enum|class)$", end="^({|;)$")
+@with_matched_tokens(start=match_regex("^(struct|enum|class)$"),
+                     end=match_regex("^({|;)$"))
 def typename_capitalized(tokens, *, match):
     """Flag type names that aren't capitalized."""
     type = match[0].value
@@ -53,7 +54,8 @@ def typename_capitalized(tokens, *, match):
 
 
 @linter.register
-@with_matched_tokens(start="^enum$", end="^{$")
+@with_matched_tokens(start=match_regex("^enum$"),
+                     end=match_regex("^{$"))
 def enums_end_with_e(tokens, *, match):
     """Flag enums that don't end with '_e'."""
     enum = match[1]
@@ -65,7 +67,8 @@ def enums_end_with_e(tokens, *, match):
 
 
 @linter.register
-@with_matched_tokens(start="^typedef$", end="^;$")
+@with_matched_tokens(start=match_regex("^typedef$"),
+                     end=match_regex("^;$"))
 def typedefs_end_with_t(tokens, *, match):
     """Flag typedefs that don't end with '_t'."""
     typedef = match[-2]
@@ -82,7 +85,8 @@ def typedefs_end_with_t(tokens, *, match):
 
 
 @linter.register
-@with_matched_tokens(start="^(==|!=)$", end="^\)$")
+@with_matched_tokens(start=match_regex("^(==|!=)$"),
+                     end=match_regex("^\)$"))
 def comparison_to_zero(tokens, *, match):
     """Flag comparisons to zero or NULL."""
     operator = match[0]

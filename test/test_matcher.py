@@ -1,6 +1,13 @@
 """Test the token matcher."""
-from lint381.matcher import match_tokens, with_matched_tokens
-from lint381.tokenizer import tokenize
+from lint381.matcher import match_regex, match_tokens, with_matched_tokens
+from lint381.tokenizer import Token, tokenize
+
+
+def test_match_regex():
+    """Ensure that the regex matcher matches tokens correctly."""
+    token = Token(value="foo", start=None, end=None)
+    assert match_regex("^foo$")(token)
+    assert not match_regex("^bar$")(token)
 
 
 def test_match_tokens():
@@ -17,8 +24,8 @@ foo bar
     assert expected == [
         [token.value for token in match]
         for match in match_tokens(tokenize(code),
-                                  start="foo",
-                                  end="bar")]
+                                  start=match_regex("foo"),
+                                  end=match_regex("bar"))]
 
 
 def test_no_matching_token():
@@ -27,7 +34,9 @@ def test_no_matching_token():
 foo
 """
 
-    assert not list(match_tokens(tokenize(code), start="foo", end="bar"))
+    assert not list(match_tokens(tokenize(code),
+                                 start=match_regex("foo"),
+                                 end=match_regex("bar")))
 
 
 def test_not_enough_lookahead():
@@ -37,8 +46,8 @@ foo bar
 """
 
     assert not list(match_tokens(tokenize(code),
-                                 start="foo",
-                                 end="bar",
+                                 start=match_regex("foo"),
+                                 end=match_regex("bar"),
                                  lookahead=1))
 
 
@@ -48,7 +57,8 @@ def test_with_matching_tokens():
 foo bar
 """
 
-    @with_matched_tokens(start="foo", end="bar")
+    @with_matched_tokens(start=match_regex("foo"),
+                         end=match_regex("bar"))
     def func(tokens, match):
         return "baz"
 
