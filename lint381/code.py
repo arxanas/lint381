@@ -4,15 +4,26 @@ import functools
 import re
 
 
-Position = collections.namedtuple("Position", [
+class Position(collections.namedtuple("Position", [
     "row",
     "column",
-])
-"""A position of a token.
+])):
+    """A position of a token.
 
-:ivar int row: The row of the position. 0-indexed.
-:ivar int column: The column of the position. 0-indexed.
-"""
+    :ivar int row: The row of the position. 0-indexed.
+    :ivar int column: The column of the position. 0-indexed.
+    """
+
+    @property
+    def line_display(self):
+        """Return the position as a line/column number.
+
+        :returns str: The description of the position.
+        """
+        return "line {line}, column {column}".format(
+            line=self.row + 1,
+            column=self.column + 1,
+        )
 
 Token = collections.namedtuple("Token", [
     "value",
@@ -22,73 +33,201 @@ Token = collections.namedtuple("Token", [
 """A token in the source file.
 
 :ivar str value: The string value of the token.
-:ivar lint381.code.Position start: The start of the token.
-:ivar lint381.code.Position end: The end of the token.
+:ivar Position start: The start of the token.
+:ivar Position end: The end of the token.
 """
 
 
 def tokenize(string):
-    """Split a string into tokens.
+    """Tokenize a string.
 
-    This assumes that the string is valid code.
+    :returns list: A list of tokens in the string.
+    """
+    return list(_Tokenizer(string).tokenize())
+
+
+class _Tokenizer:
+    """Tokenize C/C++ code.
 
     Note that tokenizing C++ is really hard. This doesn't even try to be good
     at it.
-
-    TODO: Tokenize strings and comments correctly.
-
-    :param str string: The string to tokenize. This could be a line or a file.
-    :returns list: A list of `lint381.code.Token`s.
     """
-    end_tokens = ["(", ")", "[", "]", "{", "}", ";"]
-    row = 0
-    column = 0
 
-    tokens = []
-    token_start = None
-    token_start_index = None
-    for i, c in enumerate(string):
-        if c == "\n":
-            row += 1
-            column = 0
+    _TOKEN_PATTERNS = [
+        # Number.
+        r"""
+        [0-9]+
 
-        def get_next_char():
-            if i == len(string) - 1:
-                # Pretend there's a word-breaking next token.
-                return " "
+        # Optional decimal point.
+        (\.?[0-9]*)
+        """,
+
+        # Identifier.
+        r"""
+        # Possibly a preprocessor directive.
+        [#]?
+
+        [_a-zA-Z][_a-zA-Z0-9]+
+        """,
+
+        # Single-character tokens.
+        r"""
+        [
+            ( )
+            \[ \]
+            { }
+            < >
+            ! ~
+            + \- * / ^ % & | =
+            '
+            ;
+        ]
+        """
+    ]
+    _TOKEN_PATTERNS = [re.compile(i, re.VERBOSE)
+                       for i in _TOKEN_PATTERNS]
+
+    def __init__(self, string):
+        """Tokenize the provided code."""
+        # Add a dummy whitespace character to end the last token.
+        self._string = string + " "
+        self._cursor = 0
+
+        self._row = 0
+        self._column = 0
+
+    def _char(self):
+        """Get the character under the cursor.
+
+        :returns str: The current character.
+        """
+        assert self._cursor >= 0
+        return self._string[self._cursor]
+
+    def _advance_cursor(self):
+        """Advance the cursor by one character."""
+        if self._char() == "\n":
+            self._row += 1
+            self._column = 0
+        else:
+            self._column += 1
+
+        self._cursor += 1
+
+    def _position(self):
+        """Get the position of the cursor.
+
+        :return Position: The position of the cursor.
+        """
+        assert 0 <= self._row < len(self._string)
+        assert 0 <= self._column < len(self._string)
+        return Position(row=self._row, column=self._column)
+
+    def tokenize(self):
+        """Tokenize the provided string.
+
+        This assumes that the string is valid code.
+
+        :returns list: A list of tokens in the string.
+        """
+        while self._consume_whitespace():
+            token = self._get_next_token()
+            if not token:
+                return
+            yield token
+            self._advance_cursor()
+
+    def _get_next_token(self):
+        """Get the next token from the input string.
+
+        This should leave the cursor at the last character of the returned
+        token.
+
+        :returns Token: The next token in the input.
+        """
+        # Special cases that we need to handle with higher priority or aren't
+        # easily handled by regexes.
+        special_consumers = [self._consume_string]
+        for func in special_consumers:
+            token = func()
+            if token:
+                return token
+
+        token_values = [self._match_pattern(pattern)
+                        for pattern in self._TOKEN_PATTERNS]
+        token_values = [i for i in token_values if i]
+        if not token_values:
+            return None
+
+        # Maximal munch -- pick the longest token.
+        token_values.sort(key=len, reverse=True)
+        value = token_values[0]
+
+        start_position = self._position()
+        # Leave our cursor at the value at the end of the token.
+        for _ in range(len(value) - 1):
+            self._advance_cursor()
+        end_position = self._position()
+        return Token(value=value,
+                     start=start_position,
+                     end=end_position)
+
+    def _match_pattern(self, pattern):
+        """If the pattern appears at the beginning of the stream, return it.
+
+        :param pattern: The compiled regex.
+        :returns str: The matched pattern, or `None` if there was no
+            such token.
+        """
+        match = pattern.match(self._string[self._cursor:])
+        if match:
+            return match.group()
+        else:
+            return None
+
+    def _consume_whitespace(self):
+        """Remove whitespace from the beginning of the stream.
+
+        :returns bool: Whether there is anything else left in the stream.
+        """
+        while self._cursor < len(self._string):
+            if self._char().isspace():
+                self._advance_cursor()
             else:
-                return string[i + 1]
-        next_char = get_next_char()
+                return True
+        return False
 
-        def get_token_value():
-            return string[token_start_index:i + 1]
+    def _consume_string(self):
+        """Get a string literal from the stream, if possible.
 
-        def start_token():
-            nonlocal token_start
-            nonlocal token_start_index
-            token_start = Position(row, column)
-            token_start_index = i
+        :returns Token: The string token, or `None` if there was no string at
+            the current position.
+        :raises ValueError: There was an unterminated string literal.
+        """
+        if self._char() != '"':
+            return None
 
-        def end_token():
-            nonlocal token_start
-            nonlocal token_start_index
-            token_end = Position(row, column)
-            tokens.append(Token(start=token_start,
-                                end=token_end,
-                                value=get_token_value()))
-            token_start = None
+        start_index = self._cursor
+        start_position = self._position()
+        # Skip the current quotation mark.
+        self._advance_cursor()
 
-        if not c.isspace():
-            if token_start is None:
-                start_token()
-            if (get_token_value() in end_tokens or
-                    next_char in end_tokens or
-                    next_char.isspace()):
-                end_token()
+        while self._cursor < len(self._string):
+            if self._char() == "\\":
+                # Ignore backslash escape sequences.
+                self._advance_cursor()
+            elif self._char() == '"':
+                end_index = self._cursor
+                end_position = self._position()
+                break
+            self._advance_cursor()
+        else:
+            raise ValueError("Unterminated string literal at {}"
+                             .format(self._position().line_display))
 
-        if c != "\n":
-            column += 1
-    return tokens
+        return Token(value=self._string[start_index:end_index + 1],
+                     start=start_position,
+                     end=end_position)
 
 
 class match_tokens:
@@ -154,7 +293,7 @@ class match_tokens:
     def _token_matches_pattern(self, token, pattern):
         """Determine whether a token matches a start/end pattern.
 
-        :param lint381.code.Token token: The token.
+        :param Token token: The token.
         :param str pattern: The start or end pattern.
         :returns bool: Whether or not the token matches.
         """

@@ -1,0 +1,2 @@
+string.c:1:8: error: Struct name 'foo' should be capitalized
+string.c:3:8: error: Struct name 'foo' should be capitalized

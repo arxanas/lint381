@@ -1,4 +1,6 @@
 """Test the code-manipulation functions."""
+import pytest
+
 from lint381.code import match_tokens, Position, Token, tokenize
 
 
@@ -41,6 +43,49 @@ foo ();
         Token(start=Position(row=3, column=6),
               end=Position(row=3, column=6),
               value=";"),
+    ]
+
+
+def test_tokenize_string():
+    """Ensure that we tokenize strings correctly."""
+    assert tokenize("""
+hello = "foo"
+;
+""".strip()) == [
+        Token(value="hello",
+              start=Position(row=0, column=0),
+              end=Position(row=0, column=4)),
+        Token(value="=",
+              start=Position(row=0, column=6),
+              end=Position(row=0, column=6)),
+        Token(value='"foo"',
+              start=Position(row=0, column=8),
+              end=Position(row=0, column=12)),
+        Token(value=";",
+              start=Position(row=1, column=0),
+              end=Position(row=1, column=0)),
+    ]
+
+
+def test_tokenize_unterminated_string_literal():
+    """Ensure that we reject unterminated string literals."""
+    with pytest.raises(ValueError):
+        tokenize(r"""
+        "foo
+        """)
+
+
+def test_tokenize_backslash_string_literal():
+    """Ensure that we handle backslash-escapes correctly in strings."""
+    code = r"""
+"foo\"bar\\baz"
+""".strip()
+    print(code)
+
+    assert tokenize(code) == [
+        Token(value=code,
+              start=Position(row=0, column=0),
+              end=Position(row=0, column=14)),
     ]
 
 
