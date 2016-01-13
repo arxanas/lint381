@@ -1,7 +1,7 @@
 """Linter tools."""
 import collections
 
-from .code import tokenize
+from .tokenizer import tokenize
 
 
 Error = collections.namedtuple("Error", [

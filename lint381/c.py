@@ -1,6 +1,6 @@
 """C linters."""
-from .code import with_matched_tokens
 from .linter import Error, Linter
+from .matcher import with_matched_tokens
 
 linter = Linter()
 
