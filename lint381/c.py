@@ -70,6 +70,11 @@ def typedefs_end_with_t(tokens, match):
     """Flag typedefs that don't end with '_t'."""
     typedef = match[-2]
     typedef_name = typedef.value
+
+    # Assume it's a function pointer, so don't try to name that.
+    if typedef_name == ")":
+        return
+
     if not typedef_name.endswith("_t"):
         return Error(message="Typedef '{}' should end with '_t'"
                      .format(typedef_name),
