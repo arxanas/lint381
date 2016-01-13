@@ -5,7 +5,7 @@ from lint381.tokenizer import Token, tokenize
 
 def test_match_regex():
     """Ensure that the regex matcher matches tokens correctly."""
-    token = Token(value="foo", start=None, end=None)
+    token = Token(type="identifier", value="foo", start=None, end=None)
     assert match_regex("^foo$")(token)
     assert not match_regex("^bar$")(token)
 

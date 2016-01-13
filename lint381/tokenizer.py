@@ -25,12 +25,14 @@ class Position(collections.namedtuple("Position", [
         )
 
 Token = collections.namedtuple("Token", [
+    "type",
     "value",
     "start",
     "end",
 ])
 """A token in the source file.
 
+:ivar str type: The type of the token, such as "identifier".
 :ivar str value: The string value of the token.
 :ivar Position start: The start of the token.
 :ivar Position end: The end of the token.
@@ -53,57 +55,73 @@ class _Tokenizer:
     """
 
     _TOKEN_PATTERNS = [
-        # Number.
-        r"""
+        ("number", r"""
         [0-9]+
 
         # Optional decimal point.
         (\.?[0-9]*)
-        """,
+        """),
 
-        # Identifier.
-        r"""
+        ("identifier", r"""
         # Possibly a preprocessor directive.
         [#]?
 
         [_a-zA-Z]([_a-zA-Z0-9]+)?
-        """,
+        """),
 
-        # Single-line comment.
-        r"""
+        ("comment", r"""
         //.+
-        """,
+        """),
 
-        # Multi-character operators.
-        r"""
+        ("unary_operator", r"""
         (
-            :: |
-            \+\+ | -- |
-            == | != | >= | <= |
-            && | \|\| |
-            \+= | -= | \*= | /= | %= |
-            <<= | >>= | &= | \|= | \^= |
-            << | >>
+            \+\+ | -- | ! | ~
         )
-        """,
+        """),
 
-        # Single-character tokens.
-        r"""
+        # Two-character operators.
+        ("binary_operator", r"""
+        (
+            # Relational.
+            ==  | != | <= | >=
+
+            # Arithmetic.
+            \+= | -= | \*= | /= | %= |
+
+            # Logical.
+            &&  | \|\| |
+
+            # Bitwise.
+            <<= | >>= | &= | \|= | \^= |
+            <<  | >>  |
+        )
+        """),
+
+        # One-character operators.
+        ("binary_operator", r"""
         [
-            ( )
-            \[ \]
-            { }
+            + \- * / %
+            ^ & |
             < >
-            ! ~
-            + \- * / ^ % & | =
-            '
-            ; , .
-            ? :
+            =
         ]
-        """,
+        """),
+
+        ("grouping", r"""
+        (
+            \( | \) |
+            \[ | \] |
+            \{ | \} |
+            ::      |
+            ,  | ;  |
+            \.      |
+            \? | :  |
+            '
+        )
+        """),
     ]
-    _TOKEN_PATTERNS = [re.compile(i, re.VERBOSE)
-                       for i in _TOKEN_PATTERNS]
+    _TOKEN_PATTERNS = [(group, re.compile(pattern, re.VERBOSE))
+                       for group, pattern in _TOKEN_PATTERNS]
 
     def __init__(self, string):
         """Tokenize the provided code."""
@@ -170,23 +188,27 @@ class _Tokenizer:
             if token:
                 return token
 
-        token_values = [self._match_pattern(pattern)
-                        for pattern in self._TOKEN_PATTERNS]
-        token_values = [i for i in token_values if i]
+        token_values = [(group, self._match_pattern(pattern))
+                        for group, pattern in self._TOKEN_PATTERNS]
+        token_values = [(group, value)
+                        for group, value in token_values
+                        if value]
         if not token_values:
             raise ValueError("Couldn't parse token at {}"
                              .format(self._position().line_display))
 
         # Maximal munch -- pick the longest token.
-        token_values.sort(key=len, reverse=True)
-        value = token_values[0]
+        token_values.sort(key=lambda i: len(i[1]),
+                          reverse=True)
+        group, value = token_values[0]
 
         start_position = self._position()
         # Leave our cursor at the value at the end of the token.
         for _ in range(len(value) - 1):
             self._advance_cursor()
         end_position = self._position()
-        return Token(value=value,
+        return Token(type=group,
+                     value=value,
                      start=start_position,
                      end=end_position)
 
@@ -244,7 +266,8 @@ class _Tokenizer:
             raise ValueError("Unterminated string literal at {}"
                              .format(self._position().line_display))
 
-        return Token(value=self._string[start_index:end_index + 1],
+        return Token(type="string",
+                     value=self._string[start_index:end_index + 1],
                      start=start_position,
                      end=end_position)
 
@@ -279,6 +302,7 @@ class _Tokenizer:
             raise ValueError("Unterminated multiline comment at {}"
                              .format(self._position().line_display))
 
-        return Token(value=self._string[start_index:end_index + 1],
+        return Token(type="comment",
+                     value=self._string[start_index:end_index + 1],
                      start=start_position,
                      end=end_position)

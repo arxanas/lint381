@@ -12,35 +12,45 @@ int main() {
 }
 foo ();
 """.strip()) == [
-        Token(start=Position(row=0, column=0),
+        Token(type="identifier",
+              start=Position(row=0, column=0),
               end=Position(row=0, column=2),
               value="int"),
-        Token(start=Position(row=0, column=4),
+        Token(type="identifier",
+              start=Position(row=0, column=4),
               end=Position(row=0, column=7),
               value="main"),
-        Token(start=Position(row=0, column=8),
+        Token(type="grouping",
+              start=Position(row=0, column=8),
               end=Position(row=0, column=8),
               value="("),
-        Token(start=Position(row=0, column=9),
+        Token(type="grouping",
+              start=Position(row=0, column=9),
               end=Position(row=0, column=9),
               value=")"),
-        Token(start=Position(row=0, column=11),
+        Token(type="grouping",
+              start=Position(row=0, column=11),
               end=Position(row=0, column=11),
               value="{"),
-        Token(start=Position(row=2, column=0),
+        Token(type="grouping",
+              start=Position(row=2, column=0),
               end=Position(row=2, column=0),
               value="}"),
 
-        Token(start=Position(row=3, column=0),
+        Token(type="identifier",
+              start=Position(row=3, column=0),
               end=Position(row=3, column=2),
               value="foo"),
-        Token(start=Position(row=3, column=4),
+        Token(type="grouping",
+              start=Position(row=3, column=4),
               end=Position(row=3, column=4),
               value="("),
-        Token(start=Position(row=3, column=5),
+        Token(type="grouping",
+              start=Position(row=3, column=5),
               end=Position(row=3, column=5),
               value=")"),
-        Token(start=Position(row=3, column=6),
+        Token(type="grouping",
+              start=Position(row=3, column=6),
               end=Position(row=3, column=6),
               value=";"),
     ]
@@ -52,16 +62,20 @@ def test_tokenize_string():
 hello = "foo"
 ;
 """.strip()) == [
-        Token(value="hello",
+        Token(type="identifier",
+              value="hello",
               start=Position(row=0, column=0),
               end=Position(row=0, column=4)),
-        Token(value="=",
+        Token(type="binary_operator",
+              value="=",
               start=Position(row=0, column=6),
               end=Position(row=0, column=6)),
-        Token(value='"foo"',
+        Token(type="string",
+              value='"foo"',
               start=Position(row=0, column=8),
               end=Position(row=0, column=12)),
-        Token(value=";",
+        Token(type="grouping",
+              value=";",
               start=Position(row=1, column=0),
               end=Position(row=1, column=0)),
     ]
@@ -97,7 +111,8 @@ def test_tokenize_backslash_string_literal():
 """.strip()
 
     assert tokenize(code) == [
-        Token(value=code,
+        Token(type="string",
+              value=code,
               start=Position(row=0, column=0),
               end=Position(row=0, column=14)),
     ]
@@ -105,22 +120,14 @@ def test_tokenize_backslash_string_literal():
 
 def test_tokenize_single_line_comment():
     """Ensure that we tokenize single-line comments correctly."""
-    assert tokenize(r"""
+    assert [i.value for i in tokenize(r"""
 struct foo;
 // this is a comment with bad code: struct foo;
-""".strip()) == [
-        Token(value="struct",
-              start=Position(row=0, column=0),
-              end=Position(row=0, column=5)),
-        Token(value="foo",
-              start=Position(row=0, column=7),
-              end=Position(row=0, column=9)),
-        Token(value=";",
-              start=Position(row=0, column=10),
-              end=Position(row=0, column=10)),
-        Token(value="// this is a comment with bad code: struct foo;",
-              start=Position(row=1, column=0),
-              end=Position(row=1, column=46)),
+""".strip())] == [
+        "struct",
+        "foo",
+        ";",
+        "// this is a comment with bad code: struct foo;",
     ]
 
 
@@ -131,10 +138,12 @@ foo
 /* bar
 baz */
 """.strip()) == [
-        Token(value="foo",
+        Token(type="identifier",
+              value="foo",
               start=Position(row=0, column=0),
               end=Position(row=0, column=2)),
-        Token(value="/* bar\nbaz */",
+        Token(type="comment",
+              value="/* bar\nbaz */",
               start=Position(row=1, column=0),
               end=Position(row=2, column=5)),
     ]
