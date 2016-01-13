@@ -67,7 +67,7 @@ class _Tokenizer:
         # Possibly a preprocessor directive.
         [#]?
 
-        [_a-zA-Z][_a-zA-Z0-9]+
+        [_a-zA-Z]([_a-zA-Z0-9]+)?
         """,
 
         # Single-line comment.
