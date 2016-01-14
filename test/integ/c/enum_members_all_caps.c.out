@@ -1,2 +1,6 @@
 enum_members_all_caps.c:2:5: error: Enum member 'bar' should be all-caps
+    bar,
+    ^^^
 enum_members_all_caps.c:8:5: error: Enum member 'baz' should be all-caps
+    baz,
+    ^^^

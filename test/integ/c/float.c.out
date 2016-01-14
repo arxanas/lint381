@@ -1,1 +1,3 @@
 float.c:1:1: error: Prohibited type 'float'
+float foo;
+^^^^^

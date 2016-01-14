@@ -1,2 +1,6 @@
 enum_name.c:1:6: error: Enum name 'foo' should be capitalized
+enum foo {};
+     ^^^
 enum_name.c:1:6: error: Enum 'foo' should end with '_e'
+enum foo {};
+     ^^^

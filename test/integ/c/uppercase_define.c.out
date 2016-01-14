@@ -1,1 +1,3 @@
 uppercase_define.c:1:9: error: Macro 'collection_h' should be uppercase
+#define collection_h
+        ^^^^^^^^^^^^

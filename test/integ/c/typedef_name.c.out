@@ -1,1 +1,3 @@
 typedef_name.c:1:22: error: Typedef 'Foo_ptr' should end with '_t'
+typedef struct Foo * Foo_ptr;
+                     ^^^^^^^
