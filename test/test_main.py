@@ -41,3 +41,5 @@ def test_integ(language, input, output):
         assert result.output == expected_output
         if expected_output:
             assert result.exit_code != 0
+        else:
+            assert result.exit_code == 0

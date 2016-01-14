@@ -151,8 +151,7 @@ class _Tokenizer:
             ::      |
             ,  | ;  |
             \.      |
-            \? | :  |
-            '
+            \? | :
         )
         """),
     ]
@@ -280,7 +279,11 @@ class _Tokenizer:
             the current position.
         :raises ValueError: There was an unterminated string literal.
         """
-        if self._char() != '"':
+        if self._char() == '"':
+            quote = '"'
+        elif self._char() == "'":
+            quote = "'"
+        else:
             return None
 
         start_index = self._cursor
@@ -293,7 +296,7 @@ class _Tokenizer:
             if self._char() == "\\":
                 # Ignore backslash escape sequences.
                 self._advance_cursor()
-            elif self._char() == '"':
+            elif self._char() == quote:
                 end_index = self._cursor
                 end_position = self._position()
                 break
