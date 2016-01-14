@@ -71,3 +71,14 @@ def match_regex(regex):
     def matcher(token):
         return re.match(regex, token.value) is not None
     return matcher
+
+
+def match_type(type):
+    """Return a matcher that matches on the token's type.
+
+    :param str type: The token type.
+    :returns function: The matcher.
+    """
+    def matcher(token):
+        return token.type == type
+    return matcher

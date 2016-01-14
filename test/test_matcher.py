@@ -1,5 +1,10 @@
 """Test the token matcher."""
-from lint381.matcher import match_regex, match_tokens, with_matched_tokens
+from lint381.matcher import (
+    match_regex,
+    match_tokens,
+    match_type,
+    with_matched_tokens,
+)
 from lint381.tokenizer import Token, tokenize
 
 
@@ -8,6 +13,13 @@ def test_match_regex():
     token = Token(type="identifier", value="foo", start=None, end=None)
     assert match_regex("^foo$")(token)
     assert not match_regex("^bar$")(token)
+
+
+def test_match_type():
+    """Ensure that we match on identifier types."""
+    token = Token(type="identifier", value=None, start=None, end=None)
+    assert match_type("identifier")(token)
+    assert not match_type("binary_operator")(token)
 
 
 def test_match_tokens():
