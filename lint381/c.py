@@ -125,3 +125,23 @@ def enum_members_all_caps(tokens, *, match):
             yield Error(message="Enum member '{}' should be all-caps"
                                 .format(enum_member.value),
                         tokens=[enum_member])
+
+
+@linter.register
+@with_matched_tokens(start=match_regex("^\($"),
+                     end=match_regex("^malloc$"))
+def cast_malloc(tokens, *, match):
+    """Flag casting the result of 'malloc'."""
+    # Ensure that there's no nesting: that would suggest that we're matching an
+    # unrelated open-parenthesis.
+    if any(i.value == "(" for i in match[1:]):
+        return
+
+    # Ensure that the open paren matches with a close paren right before the
+    # malloc (i.e. is a cast).
+    close_paren = match[-2]
+    if close_paren.value != ")":
+        return
+
+    yield Error(message="Don't cast the result of malloc",
+                tokens=match[:-1])

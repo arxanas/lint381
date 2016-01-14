@@ -1,0 +1,3 @@
+cast_malloc.c:3:12: error: Don't cast the result of malloc
+int* baz = (int*) malloc(sizeof(int));
+           ^^^^^^

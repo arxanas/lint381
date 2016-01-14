@@ -55,7 +55,6 @@ def match_tokens(tokens, *, start, end=None, lookahead=0):
                     j += lookahead
                     if j < len(tokens):
                         yield tokens[i:j + 1]
-                    i = j
                     break
         i += 1
 
