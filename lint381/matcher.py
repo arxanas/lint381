@@ -26,9 +26,7 @@ class with_matched_tokens:
             tokens = args[0]
             for match in match_tokens(tokens, **self._kwargs):
                 kwargs["match"] = match
-                error = func(*args, **kwargs)
-                if error:
-                    yield error
+                yield from func(*args, **kwargs)
         return wrapped
 
 

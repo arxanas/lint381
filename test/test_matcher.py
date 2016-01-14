@@ -72,6 +72,6 @@ foo bar
     @with_matched_tokens(start=match_regex("foo"),
                          end=match_regex("bar"))
     def func(tokens, match):
-        return "baz"
+        yield "baz"
 
     assert list(func(tokenize(code))) == ["baz"]

@@ -12,7 +12,7 @@ int main() {
 }
 foo ();
 """.strip()) == [
-        Token(type="identifier",
+        Token(type="keyword",
               start=Position(row=0, column=0),
               end=Position(row=0, column=2),
               value="int"),
