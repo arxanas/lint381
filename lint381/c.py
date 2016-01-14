@@ -96,12 +96,12 @@ def typedefs_end_with_t(tokens, *, match):
 @linter.register
 @with_matched_tokens(start=match_regex("^(==|!=)$"),
                      end=match_regex("^\)$"))
-def comparison_to_zero(tokens, *, match):
-    """Flag comparisons to zero or NULL."""
+def comparison_to_null(tokens, *, match):
+    """Flag comparisons to null values."""
     operator = match[0]
     operand = match[1]
 
-    if operator.value in ["==", "!="] and operand.value in ["0", "NULL"]:
+    if operator.value in ["==", "!="] and operand.value in [r"'\0'", "NULL"]:
         yield Error(message="Comparison to {} should be avoided"
                             .format(operand.value),
                     tokens=[operator, operand])

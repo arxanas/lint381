@@ -1,0 +1,12 @@
+comparison_to_null.c:2:9: error: Comparison to '\0' should be avoided
+if (foo == '\0') {}
+        ^^^^^^^
+comparison_to_null.c:3:9: error: Comparison to NULL should be avoided
+if (foo == NULL) {}
+        ^^^^^^^
+comparison_to_null.c:5:9: error: Comparison to '\0' should be avoided
+if (foo != '\0') {}
+        ^^^^^^^
+comparison_to_null.c:6:9: error: Comparison to NULL should be avoided
+if (foo != NULL) {}
+        ^^^^^^^
