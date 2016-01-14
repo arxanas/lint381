@@ -15,7 +15,7 @@ def main(files):
 
     had_errors = False
     for file in files:
-        code = file.read()
+        code = file.read().replace("\t", " " * 4)
         errors = linter.lint(code)
         if errors:
             had_errors = True
