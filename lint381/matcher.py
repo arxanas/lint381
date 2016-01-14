@@ -45,16 +45,25 @@ def match_tokens(tokens, *, start, end=None, lookahead=0):
 
     i = 0
     while i < len(tokens):
-        token = tokens[i]
-        if start(token):
+        start_token = tokens[i]
+        if start(start_token):
             # Scan ahead for the matching end token.
             for j, end_token in enumerate(tokens[i:], i):
+                # If we find a better starting point, use that instead. This
+                # minimizes the distance between the start and the end token.
+                if start(end_token):
+                    start_token = end_token
+                    i = j
+
                 if end(end_token):
                     # If we can't provide enough lookahead, don't yield the
                     # match at all.
                     j += lookahead
                     if j < len(tokens):
                         yield tokens[i:j + 1]
+
+                    # Skip forward to this token.
+                    i = j
                     break
         i += 1
 
