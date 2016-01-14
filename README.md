@@ -15,11 +15,21 @@ your source files:
 
 ```
 $ cat main.c
-#define __FOO__
-
-int main() {
-    // ...
+enum foo {
+    bar,
+    baz
 }
 $ lint381 main.c
-main.c:1: error: Macro '__FOO__' should not start with an underscore
+main.c:1:6: error: Enum name 'foo' should be capitalized
+enum foo {
+     ^^^
+main.c:1:6: error: Enum 'foo' should end with '_e'
+enum foo {
+     ^^^
+main.c:2:5: error: Enum member 'bar' should be all-caps
+    bar,
+    ^^^
+main.c:3:5: error: Enum member 'baz' should be all-caps
+    baz
+    ^^^
 ```
