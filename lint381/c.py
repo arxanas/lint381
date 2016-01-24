@@ -87,6 +87,10 @@ def typedefs_end_with_t(tokens, *, match):
     if typedef_name == ")":
         return
 
+    # We're inside a construct like `typedef struct { struct Foo_t bar; };`.
+    if any(i.value == "{" for i in match):
+        return
+
     if not typedef_name.endswith("_t"):
         yield Error(message="Typedef '{}' should end with '_t'"
                             .format(typedef_name),
