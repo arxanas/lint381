@@ -105,6 +105,11 @@ def comparison_to_null(tokens, *, match):
     operator = match[0]
     operand = match[1]
 
+    # Ensure that we only match comparisons inside an if-statement or similar.
+    next_token = match[2]
+    if next_token.value != ")":
+        return
+
     if operator.value in ["==", "!="] and operand.value in [r"'\0'", "NULL"]:
         yield Error(message="Comparison to {} should be avoided"
                             .format(operand.value),
