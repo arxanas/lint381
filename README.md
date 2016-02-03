@@ -19,7 +19,7 @@ enum foo {
     bar,
     baz
 }
-$ lint381 main.c
+$ lint381 --lang=c main.c
 main.c:1:6: error: Enum name 'foo' should be capitalized
 enum foo {
      ^^^
@@ -33,3 +33,6 @@ main.c:3:5: error: Enum member 'baz' should be all-caps
     baz
     ^^^
 ```
+
+You can use `--lang=c` or `--lang=cpp` to check your code in different modes.
+The default is C++.
