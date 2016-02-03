@@ -31,11 +31,12 @@ def source_code_files(language):
     return tests
 
 
-@pytest.mark.parametrize("language, input, output", source_code_files("c"))
+@pytest.mark.parametrize("language, input, output",
+                         source_code_files("c") + source_code_files("cpp"))
 def test_integ(language, input, output):
     """Run integration tests."""
     runner = CliRunner()
-    result = runner.invoke(main, [input])
+    result = runner.invoke(main, ["--lang", language, input])
     with open(output) as f:
         expected_output = f.read()
         assert result.output == expected_output

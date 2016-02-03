@@ -4,14 +4,18 @@ import os.path
 import click
 
 from .c import linter as c_linter
+from .cpp import linter as cpp_linter
 
 
 @click.command()
 @click.argument("files", nargs=-1, type=click.File())
-def main(files):
+@click.option("--lang", type=click.Choice(["c", "cpp"]), default="cpp")
+def main(files, lang):
     """Lint the files specified on the command-line."""
-    # TODO: Select at runtime with the --c and --cpp flags.
-    linter = c_linter
+    linter = {
+        "c": c_linter,
+        "cpp": cpp_linter,
+    }[lang]
 
     had_errors = False
     for file in files:

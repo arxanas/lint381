@@ -17,11 +17,15 @@ Error = collections.namedtuple("Error", [
 
 
 class Linter:
-    """A registry of linters for a specific language."""
+    """A registry of linters for a specific language.
+
+    :ivar list linters: The list of linting functions associated with this
+        linter.
+    """
 
     def __init__(self):
         """Initialize the linter registry to be empty."""
-        self._linters = []
+        self.linters = []
 
     def register(self, func):
         """Register the provided function as a linter.
@@ -38,7 +42,7 @@ class Linter:
 
         :param function func: The linting function.
         """
-        self._linters.append(func)
+        self.linters.append(func)
         return func
 
     def lint(self, code):
@@ -48,7 +52,7 @@ class Linter:
         """
         errors = []
 
-        for func in self._linters:
+        for func in self.linters:
             errors.extend(func(tokenize(code)))
 
         return errors
