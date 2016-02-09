@@ -1,0 +1,3 @@
+null.cpp:1:12: error: Use nullptr in C++ code, not NULL
+int* foo = NULL;
+           ^^^^
