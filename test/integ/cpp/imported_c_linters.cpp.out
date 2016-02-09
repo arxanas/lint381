@@ -1,0 +1,3 @@
+imported_c_linters.cpp:1:9: error: Macro 'bad' should be uppercase
+#define bad
+        ^^^

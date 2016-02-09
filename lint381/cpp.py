@@ -1,13 +1,18 @@
 """C++ linters."""
-from .c import linter as c_linter
+from lint381 import c
 from .linter import Error, Linter
 from .matcher import match_type, with_matched_tokens
 
 linter = Linter()
 
-# Import the C linters into the C++ linter.
-for lint_func in c_linter.linters:
-    linter.register(lint_func)
+_IMPORTED_C_LINTERS = [
+    "prohibited_types",
+    "underscore_define",
+    "uppercase_define",
+    "typename_capitalized",
+]
+for linter_func in _IMPORTED_C_LINTERS:
+    linter.register(getattr(c, linter_func))
 
 
 @linter.register
