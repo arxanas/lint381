@@ -1,0 +1,6 @@
+catch_by_value.cpp:1:8: error: Catch exceptions by reference, not value
+catch (foo) {}
+       ^^^
+catch_by_value.cpp:3:8: error: Catch exceptions by reference, not value
+catch (bar e) {}
+       ^^^^^

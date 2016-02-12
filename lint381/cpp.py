@@ -186,3 +186,18 @@ def post_increment_iterator(tokens, *, match):
         yield Error(message="Use pre-increment instead of post-increment "
                             "for iterators in loops",
                     tokens=match[:-1])
+
+
+@linter.register
+@with_matched_tokens(start=match_regex("^catch$"), end=match_regex(r"^\)"))
+def catch_exception_by_value(tokens, *, match):
+    """Flag exceptions being caught by value instead of by reference."""
+    exception = match[2:-1]
+
+    # Don't flag catching `...`.
+    if [i.value for i in exception] == [".", ".", "."]:
+        return
+
+    if not any("&" in i.value for i in exception):
+        yield Error(message="Catch exceptions by reference, not value",
+                    tokens=exception)
