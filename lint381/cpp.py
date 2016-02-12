@@ -1,4 +1,6 @@
 """C++ linters."""
+import re
+
 from lint381 import c
 from .linter import Error, Linter
 from .matcher import match_regex, match_type, with_matched_tokens
@@ -24,17 +26,28 @@ def triple_asterisk_comment(tokens, *, match):
         yield Error(message="Remove triple-asterisk comments", tokens=match)
 
 
+_DEPRECATED_TOKEN_SUGGESTIONS = {
+    "NULL": "nullptr",
+    "malloc": "new",
+    "free": "delete",
+    "typedef": "using",
+    "scanf": "cin",
+    "printf": "cout",
+}
+"""Tokens that are deprecated in C++ and their replacements."""
+
+_DEPRECATED_TOKEN_REGEX = "^{}$".format(
+    "|".join(re.escape(i) for i in _DEPRECATED_TOKEN_SUGGESTIONS)
+)
+"""Matches a deprecated token."""
+
+
 @linter.register
-@with_matched_tokens(start=match_regex("^NULL|malloc|free|typedef$"))
-def prohibited_tokens(tokens, *, match):
-    """Flag usage of NULL, malloc, and free."""
+@with_matched_tokens(start=match_regex(_DEPRECATED_TOKEN_REGEX))
+def deprecated_tokens(tokens, *, match):
+    """Suggest alternatives to deprecated tokens such as `NULL`."""
     bad_token = match[0].value
-    suggestion = {
-        "NULL": "nullptr",
-        "malloc": "new",
-        "free": "delete",
-        "typedef": "using",
-    }[bad_token]
+    suggestion = _DEPRECATED_TOKEN_SUGGESTIONS[bad_token]
     yield Error(message="Use '{}' in C++ code, not '{}'"
                         .format(suggestion, bad_token),
                 tokens=match)

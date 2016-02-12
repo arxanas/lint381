@@ -1,0 +1,12 @@
+deprecated_tokens.cpp:1:12: error: Use 'nullptr' in C++ code, not 'NULL'
+int* foo = NULL;
+           ^^^^
+deprecated_tokens.cpp:3:12: error: Use 'new' in C++ code, not 'malloc'
+int* bar = malloc(5);
+           ^^^^^^
+deprecated_tokens.cpp:5:1: error: Use 'delete' in C++ code, not 'free'
+free(bar);
+^^^^
+deprecated_tokens.cpp:7:1: error: Use 'using' in C++ code, not 'typedef'
+typedef foo bar;
+^^^^^^^
