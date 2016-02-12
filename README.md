@@ -8,34 +8,31 @@ can be found here:
   * [C coding standard](http://umich.edu/~eecs381/handouts/C_Coding_Standards.pdf)
   * [C++ coding standard](http://umich.edu/~eecs381/handouts/C++_Coding_Standards.pdf)
 
+Here's `lint381` in action:
+
+![Example lint381 usage](media/example.png)
+
 # Usage
 
-`lint381` requires Python 3. Install with `pip install lint381`. Then run it on
-your source files:
+`lint381` requires Python 3, so you may want to install it inside a `virtualenv`
+or use `pip3` instead of `pip`.
 
-```
-$ cat main.c
-enum foo {
-    bar,
-    baz
-}
-$ lint381 --lang=c main.c
-main.c:1:6: error: Enum name 'foo' should be capitalized
-enum foo {
-     ^^^
-main.c:1:6: error: Enum 'foo' should end with '_e'
-enum foo {
-     ^^^
-main.c:2:5: error: Enum member 'bar' should be all-caps
-    bar,
-    ^^^
-main.c:3:5: error: Enum member 'baz' should be all-caps
-    baz
-    ^^^
-```
+Install it:
 
-You can use `--lang=c` or `--lang=cpp` to check your code in different modes.
-The default is C++.
+    $ pip install lint381
+
+Pass source files to `lint381` to have it check them. Typically you'll just use
+a pattern like `*.cpp *.h` to match all source files in the current directory.
+
+    $ lint381 *.cpp *.h
+
+If `lint381` detected any errors, it will exit with a non-zero status and print
+the errors. Otherwise it will exit with zero and produce no output.
+
+By default, `lint381` assumes your source files are in C++. You can explicitly
+set the language with `--lang=c` or `--lang=cpp`:
+
+    $ lint381 --lang=c *.c *.h
 
 # Features
 
@@ -68,3 +65,7 @@ The C++ linter flags the following:
   * Creating a type alias for an iterator instead of its container (i.e. `using
 	Foo_t = std::vector<int>::iterator` instead of `using Foo_t =
 std::vector<int>; /* ... */ Foo_t::iterator`).
+
+# License
+
+`lint381` is licensed under GPLv3.
