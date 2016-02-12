@@ -60,13 +60,10 @@ def typename_capitalized(tokens, *, match):
 
 @linter.register
 @with_matched_tokens(start=match_regex("^enum$"),
-                     end=match_type("identifier"))
+                     end=match_type("identifier"),
+                     length=2)
 def enums_end_with_e(tokens, *, match):
     """Flag enums that don't end with '_e'."""
-    if len(match) != 2:
-        # We picked up an unrelated identifier.
-        return
-
     enum = match[-1]
     enum_name = enum.value
     if not enum_name.endswith("_e"):
@@ -153,11 +150,11 @@ def cast_malloc(tokens, *, match):
 
 @linter.register
 @with_matched_tokens(start=match_regex("^const$"),
-                     end=match_regex("^]$"))
+                     end=match_regex("^]$"),
+                     length=5)
 def string_constant_array(tokens, *, match):
     """Flag string constants declared as an array instead of a pointer."""
-    # Match only "const char foo[]" (five tokens)
-    if len(match) != 5 or match[1].value != "char":
+    if match[1].value != "char":
         return
 
     constant_name = match[2].value

@@ -117,13 +117,10 @@ def use_const_not_define(tokens, *, match):
 
 @linter.register
 @with_matched_tokens(start=match_regex("^template$"),
-                     end=match_regex("^class$"))
+                     end=match_regex("^class$"),
+                     length=3)
 def use_typename_over_class(tokens, *, match):
     """Flag using class in template parameters."""
-    # Three tokens: "template < class"
-    if len(match) != 3:
-        return
-
     template_var_type = match[-1]
     yield Error(message="Use 'typename' instead of 'class' "
                         "for template parameters",
@@ -131,16 +128,14 @@ def use_typename_over_class(tokens, *, match):
 
 
 @linter.register
-@with_matched_tokens(start=match_regex("^while$"), end=match_regex(r"^\)$"))
+@with_matched_tokens(start=match_regex("^while$"),
+                     end=match_regex(r"^\)$"),
+                     length=4)
 def loop_condition_boolean(tokens, *, match):
     """Flag using a literal `0` or `1` in a loop condition.
 
     Instead use `true` or `false`.
     """
-    # Four tokens: "while ( 1 )"
-    if len(match) != 4:
-        return
-
     condition = match[2].value
     try:
         suggestion = {
@@ -157,12 +152,11 @@ def loop_condition_boolean(tokens, *, match):
 
 @linter.register
 @with_matched_tokens(start=match_regex("^\.$"),
-                     end=match_regex("^compare$"))
+                     end=match_regex("^compare$"),
+                     length=2)
 def string_compare(tokens, *, match):
     """Flag using string::compare.
 
     This just assumes that any instance of `.compare` can't be correct.
     """
-    # Two tokens: ". compare".
-    if len(match) == 2:
-        yield Error(message="Don't use 'string::compare'", tokens=match)
+    yield Error(message="Don't use 'string::compare'", tokens=match)

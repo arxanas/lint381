@@ -30,7 +30,7 @@ class with_matched_tokens:
         return wrapped
 
 
-def match_tokens(tokens, *, start, end=None, lookahead=0):
+def match_tokens(tokens, *, start, end=None, lookahead=0, length=None):
     """Find the specified pattern in the tokens.
 
     :param list tokens: A sequence of tokens to find matches in.
@@ -38,33 +38,54 @@ def match_tokens(tokens, *, start, end=None, lookahead=0):
     :param str end: The ending pattern to match a token value against.
     :param int lookahead: The number of extra tokens after the ending token to
         return.
+    :param int length: The number of tokens to match, exactly.
     :yields list: A subsequence of matched tokens.
     """
     if end is None:
         end = start
 
+    if length is not None:
+        assert length > 0
+        assert not lookahead, "Lookahead not implemented for length != 0"
+
     i = 0
     while i < len(tokens):
         start_token = tokens[i]
         if start(start_token):
-            # Scan ahead for the matching end token.
-            for j, end_token in enumerate(tokens[i:], i):
-                # If we find a better starting point, use that instead. This
-                # minimizes the distance between the start and the end token.
-                if start(end_token):
-                    start_token = end_token
-                    i = j
+            # Quick path in case we know the exact length we want.
+            if length is not None:
+                # Subtract one because we want an inclusive interval.
+                j = i + length - 1
+
+                try:
+                    end_token = tokens[j]
+                except IndexError:
+                    # We indexed out of bounds, so we can't possibly find a
+                    # match of the specified length anymore.
+                    break
 
                 if end(end_token):
-                    # If we can't provide enough lookahead, don't yield the
-                    # match at all.
-                    j += lookahead
-                    if j < len(tokens):
-                        yield tokens[i:j + 1]
+                    yield tokens[i:j + 1]
+            else:
+                # Scan ahead for the matching end token.
+                for j, end_token in enumerate(tokens[i:], i):
+                    # If we find a better starting point, use that instead.
+                    # This minimizes the distance between the start and the end
+                    # token.
+                    if start(end_token):
+                        start_token = end_token
+                        i = j
 
-                    # Skip forward to this token.
-                    i = j
-                    break
+                    if end(end_token):
+                        # If we can't provide enough lookahead, don't yield the
+                        # match at all.
+                        j += lookahead
+                        if j < len(tokens):
+                            yield tokens[i:j + 1]
+
+                        # Skip forward to this token.
+                        i = j
+                        break
         i += 1
 
 
