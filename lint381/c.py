@@ -159,6 +159,6 @@ def string_constant_array(tokens, *, match):
 
     constant_name = match[2].value
     brackets = match[-2:]
-    yield Error(message="Declare '{}' as 'const char*', not 'const char[]'"
+    yield Error(message="Declare '{}' as 'const char* const', not 'const char[]'"
                         .format(constant_name),
                 tokens=brackets)
