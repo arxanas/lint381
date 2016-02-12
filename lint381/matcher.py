@@ -68,7 +68,9 @@ def match_tokens(tokens, *, start, end=None, lookahead=0, length=None):
                     yield tokens[i:j + 1]
             else:
                 # Scan ahead for the matching end token.
-                for j, end_token in enumerate(tokens[i:], i):
+                for j in range(i, len(tokens)):
+                    end_token = tokens[j]
+
                     # If we find a better starting point, use that instead.
                     # This minimizes the distance between the start and the end
                     # token.
