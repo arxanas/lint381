@@ -1,0 +1,12 @@
+prohibited_tokens.cpp:1:1: error: Don't use 'memset'
+memset(foo, bar);
+^^^^^^
+prohibited_tokens.cpp:2:1: error: Don't use 'memmove'
+memmove(baz, qux);
+^^^^^^^
+prohibited_tokens.cpp:3:1: error: Don't use 'memcpy'
+memcpy(grault, xyzzy);
+^^^^^^
+prohibited_tokens.cpp:4:1: error: Don't use 'exit'
+exit(1);
+^^^^

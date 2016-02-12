@@ -54,6 +54,14 @@ def deprecated_tokens(tokens, *, match):
 
 
 @linter.register
+@with_matched_tokens(start=match_regex("^memset|memmove|memcpy|exit$"))
+def prohibited_functions(tokens, *, match):
+    """Flag prohibited functions."""
+    yield Error(message="Don't use '{}'".format(match[0].value),
+                tokens=match)
+
+
+@linter.register
 @with_matched_tokens(start=match_regex("^using$"), end=match_regex("^;$"))
 def alias_containers_not_iterators(tokens, *, match):
     """Flag type-aliasing an iterator instead of its container.
