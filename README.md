@@ -72,6 +72,7 @@ std::vector<int>; /* ... */ Foo_t::iterator`).
   * Use of `0` or `1` in loop conditions instead of `true` or `false`.
   * Use of `string::compare`.
   * Comparing `size()` to `0` instead of using `empty`.
+  * Using post-increment instead of pre-increment for iterators.
 
 # Bugs
 
