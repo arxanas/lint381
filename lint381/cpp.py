@@ -142,10 +142,13 @@ def loop_condition_boolean(tokens, *, match):
         return
 
     condition = match[2].value
-    suggestion = {
-        "0": "false",
-        "1": "true",
-    }[condition]
+    try:
+        suggestion = {
+            "0": "false",
+            "1": "true",
+        }[condition]
+    except KeyError:
+        return
 
     yield Error(message="Use '{}' instead of '{}' in loop condition"
                         .format(suggestion, condition),
