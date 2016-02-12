@@ -65,3 +65,6 @@ The C++ linter flags the following:
   * Use of `NULL` instead of `nullptr`.
   * Use of `malloc`/`free` instead of `new`/`delete`.
   * Use of `typedef` instead of `using`.
+  * Creating a type alias for an iterator instead of its container (i.e. `using
+	Foo_t = std::vector<int>::iterator` instead of `using Foo_t =
+std::vector<int>; /* ... */ Foo_t::iterator`).

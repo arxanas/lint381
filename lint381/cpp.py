@@ -37,3 +37,29 @@ def prohibited_tokens(tokens, *, match):
     yield Error(message="Use {} in C++ code, not {}"
                         .format(suggestion, bad_token),
                 tokens=match)
+
+
+@linter.register
+@with_matched_tokens(start=match_regex("^using$"), end=match_regex("^;$"))
+def alias_containers_not_iterators(tokens, *, match):
+    """Flag type-aliasing an iterator instead of its container.
+
+    For example, flag this code:
+
+        using Foo_t = std::vector<int>::iterator;
+
+    Because it should be this:
+
+        using Foo_t = std::vector<int>;
+        // ...
+        Foo_t::iterator bar = /* ... */
+    """
+    iterator = match[-2].value
+
+    # Lowercase it because there are `Iterator` and `const_Iterator`s in this
+    # class.
+    if iterator.lower() not in ["iterator", "const_iterator"]:
+        return
+
+    yield Error(message="Create type aliases for containers, not iterators",
+                tokens=match[-3:-1])
