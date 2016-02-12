@@ -4,4 +4,4 @@ while (1) {
 
 }
 
-while (foo == bar) {}
+while (foo) {}

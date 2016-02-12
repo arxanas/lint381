@@ -51,6 +51,20 @@ foo
                                  end=match_regex("bar")))
 
 
+def test_match_length():
+    """Ensure that we correctly find sequences of a provided length."""
+    code = """
+foo foo bar
+"""
+    result = match_tokens(tokenize(code),
+                          start=match_regex("foo"),
+                          end=match_regex("bar"),
+                          length=3)
+    result = list(result)
+    assert len(result) == 1
+    assert [i.value for i in result[0]] == ["foo", "foo", "bar"]
+
+
 def test_not_enough_lookahead():
     """Ensure that we don't return a match if there's not enough lookahead."""
     code = """
