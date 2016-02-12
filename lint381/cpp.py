@@ -160,3 +160,17 @@ def string_compare(tokens, *, match):
     This just assumes that any instance of `.compare` can't be correct.
     """
     yield Error(message="Don't use 'string::compare'", tokens=match)
+
+
+@linter.register
+@with_matched_tokens(start=match_regex(r"^\.$"),
+                     end=match_regex("^0$"),
+                     length=6)
+def size_equal_to_zero(tokens, *, match):
+    """Flag comparing size to zero instead of calling `empty`."""
+    values = [".", "size", "(", ")", "==", "0"]
+    if any(i.value != j for i, j in zip(match, values)):
+        return
+
+    yield Error(message="Use 'empty' instead of comparing 'size()' with '0'",
+                tokens=match)
