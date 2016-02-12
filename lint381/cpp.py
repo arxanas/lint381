@@ -10,6 +10,7 @@ _IMPORTED_C_LINTERS = [
     "underscore_define",
     "uppercase_define",
     "typename_capitalized",
+    "string_constant_array",
 ]
 for linter_func in _IMPORTED_C_LINTERS:
     linter.register(getattr(c, linter_func))

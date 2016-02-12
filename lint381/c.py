@@ -149,3 +149,19 @@ def cast_malloc(tokens, *, match):
 
     yield Error(message="Don't cast the result of malloc",
                 tokens=match[:-1])
+
+
+@linter.register
+@with_matched_tokens(start=match_regex("^const$"),
+                     end=match_regex("^]$"))
+def string_constant_array(tokens, *, match):
+    """Flag string constants declared as an array instead of a pointer."""
+    # Match only "const char foo[]" (five tokens)
+    if len(match) != 5 or match[1].value != "char":
+        return
+
+    constant_name = match[2].value
+    brackets = match[-2:]
+    yield Error(message="Declare '{}' as 'const char*', not 'const char[]'"
+                        .format(constant_name),
+                tokens=brackets)

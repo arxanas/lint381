@@ -50,6 +50,7 @@ The C linter flags the following:
   * Non-idiomatic comparison to `NULL` (such as `if (foo == NULL)`).
   * Enum members that aren't all-caps.
   * Casting the result of `malloc` (such as `foo = (char*) malloc(...)`).
+  * Defining string constants as an array instead of a pointer.
 
 ## C++ checks
 
