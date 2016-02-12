@@ -36,3 +36,32 @@ main.c:3:5: error: Enum member 'baz' should be all-caps
 
 You can use `--lang=c` or `--lang=cpp` to check your code in different modes.
 The default is C++.
+
+# Features
+
+## C checks
+
+The C linter flags the following:
+
+  * Use of prohibited types (such as `unsigned` and `float`).
+  * Macros that start with an underscore, as they are reserved by the
+	implementation.
+  * Non-uppercase `#defines` (`#define foo` is wrong, `#define FOO` is right).
+  * `struct`s and `enum`s that aren't capitalized.
+  * `enum`s that don't end with `_e`.
+  * `typedef`s that don't end with `_t`.
+  * Non-idiomatic comparison to `NULL` (such as `if (foo == NULL)`).
+  * Enum members that aren't all-caps.
+  * Casting the result of `malloc` (such as `foo = (char*) malloc(...)`).
+
+## C++ checks
+
+The C++ linter flags the following:
+
+  * All C checks above, except those that are obviated (e.g. we now use
+	`nullptr` instead of `NULL`, and don't use `malloc`).
+  * Comments with three asterisks (`***`) as those are provided by Kieras and
+	should be removed.
+  * Use of `NULL` instead of `nullptr`.
+  * Use of `malloc`/`free` instead of `new`/`delete`.
+  * Use of `typedef` instead of `using`.

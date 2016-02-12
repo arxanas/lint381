@@ -24,7 +24,16 @@ def triple_asterisk_comment(tokens, *, match):
 
 
 @linter.register
-@with_matched_tokens(start=match_regex("^NULL$"))
-def prohibited_null(tokens, *, match):
-    """Flag usage of NULL."""
-    yield Error(message="Use nullptr in C++ code, not NULL", tokens=match)
+@with_matched_tokens(start=match_regex("^NULL|malloc|free|typedef$"))
+def prohibited_tokens(tokens, *, match):
+    """Flag usage of NULL, malloc, and free."""
+    bad_token = match[0].value
+    suggestion = {
+        "NULL": "nullptr",
+        "malloc": "new",
+        "free": "delete",
+        "typedef": "using",
+    }[bad_token]
+    yield Error(message="Use {} in C++ code, not {}"
+                        .format(suggestion, bad_token),
+                tokens=match)
