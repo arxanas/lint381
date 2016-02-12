@@ -52,7 +52,8 @@ class Linter:
         """
         errors = []
 
+        tokens = tokenize(code)
         for func in self.linters:
-            errors.extend(func(tokenize(code)))
+            errors.extend(func(tokens))
 
         return errors

@@ -75,10 +75,6 @@ std::vector<int>; /* ... */ Foo_t::iterator`).
   * Use of post-increment instead of pre-increment for iterators.
   * Catching exceptions by value instead of by reference.
 
-# Bugs
-
-The tokenizer is *extremely* slow.
-
 # License
 
 `lint381` is licensed under GPLv3.

@@ -223,17 +223,19 @@ class _Tokenizer:
             if token:
                 return token
 
-        token_values = ((group, self._match_pattern(pattern))
-                        for group, pattern in self._TOKEN_PATTERNS)
-        token_values = ((group, value)
+        token_values = [(group, self._match_pattern(pattern))
+                        for group, pattern in self._TOKEN_PATTERNS]
+        token_values = [(group, value)
                         for group, value in token_values
-                        if value)
-        try:
-            # Maximal munch -- pick the longest token.
-            group, value = max(token_values, key=lambda i: len(i[1]))
-        except ValueError as e:
+                        if value]
+        if not token_values:
             raise ValueError("Couldn't parse token at {}"
-                             .format(self._position().line_display)) from e
+                             .format(self._position().line_display))
+
+        # Maximal munch -- pick the longest token.
+        token_values.sort(key=lambda i: len(i[1]),
+                          reverse=True)
+        group, value = token_values[0]
 
         start_position = self._position()
         # Leave our cursor at the value at the end of the token.
