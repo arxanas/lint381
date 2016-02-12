@@ -1,0 +1,3 @@
+typename_over_class.cpp:1:11: error: Use 'typename' instead of 'class' for template parameters
+template <class T>
+          ^^^^^

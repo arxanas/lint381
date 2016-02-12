@@ -92,3 +92,18 @@ def use_const_not_define(tokens, *, match):
                         "not #define"
                         .format(constant_name),
                 tokens=tokens_on_line)
+
+
+@linter.register
+@with_matched_tokens(start=match_regex("^template$"),
+                     end=match_regex("^class$"))
+def use_typename_over_class(tokens, *, match):
+    """Flag using class in template parameters."""
+    # Three tokens: "template <class"
+    if len(match) != 3:
+        return
+
+    template_var_type = match[-1]
+    yield Error(message="Use 'typename' instead of 'class' "
+                        "for template parameters",
+                tokens=[template_var_type])
