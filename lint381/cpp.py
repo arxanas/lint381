@@ -150,3 +150,16 @@ def loop_condition_boolean(tokens, *, match):
     yield Error(message="Use '{}' instead of '{}' in loop condition"
                         .format(suggestion, condition),
                 tokens=match[1:])
+
+
+@linter.register
+@with_matched_tokens(start=match_regex("^\.$"),
+                     end=match_regex("^compare$"))
+def string_compare(tokens, *, match):
+    """Flag using string::compare.
+
+    This just assumes that any instance of `.compare` can't be correct.
+    """
+    # Two tokens: ". compare".
+    if len(match) == 2:
+        yield Error(message="Don't use 'string::compare'", tokens=match)

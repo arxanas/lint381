@@ -1,0 +1,3 @@
+string_compare.cpp:1:8: error: Don't use 'string::compare'
+if (str.compare("foo") < 0) {
+       ^^^^^^^^

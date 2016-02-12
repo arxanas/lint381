@@ -67,9 +67,10 @@ The C++ linter flags the following:
   * Creating a type alias for an iterator instead of its container (i.e. `using
 	Foo_t = std::vector<int>::iterator` instead of `using Foo_t =
 std::vector<int>; /* ... */ Foo_t::iterator`).
-  * Using `#define` to create constants.
-  * Using `class` instead of `typename` in template parameters.
-  * Using `0` or `1` in loop conditions instead of `true` or `false`.
+  * Use of `#define` to create constants.
+  * Use of `class` instead of `typename` in template parameters.
+  * Use of `0` or `1` in loop conditions instead of `true` or `false`.
+  * Use of `string::compare`.
 
 # License
 
