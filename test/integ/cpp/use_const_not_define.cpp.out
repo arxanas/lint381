@@ -1,0 +1,6 @@
+use_const_not_define.cpp:4:1: error: Use const or constexpr to create constant 'FOO', not #define
+#define FOO (10)
+^^^^^^^^^^^^^^^^
+use_const_not_define.cpp:6:1: error: Use const or constexpr to create constant 'BAR', not #define
+#define BAR "bar"
+^^^^^^^^^^^^^^^^^

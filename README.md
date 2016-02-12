@@ -65,6 +65,7 @@ The C++ linter flags the following:
   * Creating a type alias for an iterator instead of its container (i.e. `using
 	Foo_t = std::vector<int>::iterator` instead of `using Foo_t =
 std::vector<int>; /* ... */ Foo_t::iterator`).
+  * Using `#define` to create constants.
 
 # License
 

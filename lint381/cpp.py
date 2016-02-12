@@ -63,3 +63,31 @@ def alias_containers_not_iterators(tokens, *, match):
 
     yield Error(message="Create type aliases for containers, not iterators",
                 tokens=match[-3:-1])
+
+
+@linter.register
+@with_matched_tokens(start=match_regex("^#define$"))
+def use_const_not_define(tokens, *, match):
+    """Flag using `#define` to declare constants in C++."""
+    define_token = match[0]
+    tokens_on_line = [i for i in tokens
+                      if i.start.row == define_token.start.row
+                      if i.end.row == define_token.end.row]
+
+    # This isn't a const declaration.
+    if len(tokens_on_line) <= 2:
+        return
+
+    # If there's an open-paren immediately after the `#define`d name, this is a
+    # macro definition.
+    constant_token = tokens_on_line[1]
+    open_paren = tokens_on_line[2]
+    macro_start = constant_token.end.column + 1
+    if open_paren.value == "(" and open_paren.start.column == macro_start:
+        return
+
+    constant_name = constant_token.value
+    yield Error(message="Use const or constexpr to create constant '{}', "
+                        "not #define"
+                        .format(constant_name),
+                tokens=tokens_on_line)
