@@ -68,6 +68,7 @@ The C++ linter flags the following:
 std::vector<int>; /* ... */ Foo_t::iterator`).
   * Using `#define` to create constants.
   * Using `class` instead of `typename` in template parameters.
+  * Using `0` or `1` in loop conditions instead of `true` or `false`.
 
 # License
 

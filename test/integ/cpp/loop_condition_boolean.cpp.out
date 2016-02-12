@@ -1,0 +1,6 @@
+loop_condition_boolean.cpp:1:7: error: Use 'false' instead of '0' in loop condition
+while (0);
+      ^^^
+loop_condition_boolean.cpp:3:7: error: Use 'true' instead of '1' in loop condition
+while (1) {
+      ^^^

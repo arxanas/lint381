@@ -99,7 +99,7 @@ def use_const_not_define(tokens, *, match):
                      end=match_regex("^class$"))
 def use_typename_over_class(tokens, *, match):
     """Flag using class in template parameters."""
-    # Three tokens: "template <class"
+    # Three tokens: "template < class"
     if len(match) != 3:
         return
 
@@ -107,3 +107,25 @@ def use_typename_over_class(tokens, *, match):
     yield Error(message="Use 'typename' instead of 'class' "
                         "for template parameters",
                 tokens=[template_var_type])
+
+
+@linter.register
+@with_matched_tokens(start=match_regex("^while$"), end=match_regex(r"^\)$"))
+def loop_condition_boolean(tokens, *, match):
+    """Flag using a literal `0` or `1` in a loop condition.
+
+    Instead use `true` or `false`.
+    """
+    # Four tokens: "while ( 1 )"
+    if len(match) != 4:
+        return
+
+    condition = match[2].value
+    suggestion = {
+        "0": "false",
+        "1": "true",
+    }[condition]
+
+    yield Error(message="Use '{}' instead of '{}' in loop condition"
+                        .format(suggestion, condition),
+                tokens=match[1:])
