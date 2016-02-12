@@ -1,0 +1,3 @@
+post_increment_iterator.cpp:1:46: error: Use pre-increment instead of post-increment for iterators in loops
+for (auto it = foo.begin(); it != foo.end(); it++) {
+                                             ^^^^

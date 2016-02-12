@@ -174,3 +174,15 @@ def size_equal_to_zero(tokens, *, match):
 
     yield Error(message="Use 'empty' instead of comparing 'size()' with '0'",
                 tokens=match)
+
+
+@linter.register
+@with_matched_tokens(start=match_regex("^it$"),
+                     end=match_regex(r"^\)$"),
+                     length=3)
+def post_increment_iterator(tokens, *, match):
+    """Flag iterators that use post-increment instead of pre-increment."""
+    if match[1].value == "++":
+        yield Error(message="Use pre-increment instead of post-increment "
+                            "for iterators in loops",
+                    tokens=match[:-1])
