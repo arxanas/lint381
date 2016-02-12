@@ -147,7 +147,7 @@ def cast_malloc(tokens, *, match):
     if close_paren.value != ")":
         return
 
-    yield Error(message="Don't cast the result of malloc",
+    yield Error(message="Don't cast the result of 'malloc'",
                 tokens=match[:-1])
 
 

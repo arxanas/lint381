@@ -35,7 +35,7 @@ def prohibited_tokens(tokens, *, match):
         "free": "delete",
         "typedef": "using",
     }[bad_token]
-    yield Error(message="Use {} in C++ code, not {}"
+    yield Error(message="Use '{}' in C++ code, not '{}'"
                         .format(suggestion, bad_token),
                 tokens=match)
 
@@ -88,8 +88,8 @@ def use_const_not_define(tokens, *, match):
         return
 
     constant_name = constant_token.value
-    yield Error(message="Use const or constexpr to create constant '{}', "
-                        "not #define"
+    yield Error(message="Use 'const' or 'constexpr' to create constant '{}', "
+                        "not '#define'"
                         .format(constant_name),
                 tokens=tokens_on_line)
 
