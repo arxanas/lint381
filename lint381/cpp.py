@@ -177,15 +177,15 @@ def size_equal_to_zero(tokens, *, match):
 
 
 @linter.register
-@with_matched_tokens(start=match_regex("^it$"),
+@with_matched_tokens(start=match_regex("^;$"),
                      end=match_regex(r"^\)$"),
-                     length=3)
+                     length=4)
 def post_increment_iterator(tokens, *, match):
     """Flag iterators that use post-increment instead of pre-increment."""
-    if match[1].value == "++":
+    if match[1].value == "it" and match[2].value == "++":
         yield Error(message="Use pre-increment instead of post-increment "
                             "for iterators in loops",
-                    tokens=match[:-1])
+                    tokens=match[1:-1])
 
 
 @linter.register
