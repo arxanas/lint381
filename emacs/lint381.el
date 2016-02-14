@@ -21,9 +21,16 @@
 ;; (setq flycheck-lint381-language "c")
 
 ;;; Notes:
-;; the writer of this file assumes that if you're using this, you're
-;; probably also using cppcheck. if this is not the case, this may not work.
-;; more to come on that
+
+;; The writer of this file assumes that if you're using this, you're
+;; probably also using cppcheck. If this is not the case, you will need
+;; to add some further config. The following should work:
+
+;; ; replace <checker> with whatever you're using. If you're only doing
+;; ; compilation checks it will likely be c/c++-clang or c/c++-gcc. If you're
+;; ; doing any sort of further static analyis, it's probably best to use that.
+;;
+;; (flycheck-add-next-checker '<checker> '(warning . c/c++-lint381))
 
 ;;; Code:
 
