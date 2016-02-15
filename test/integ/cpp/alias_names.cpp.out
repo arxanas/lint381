@@ -1,0 +1,6 @@
+alias_names.cpp:1:7: error: Alias 'Foo' should end with '_t'
+using Foo = int;
+      ^^^
+alias_names.cpp:3:7: error: Alias 'bar_t' should be capitalized
+using bar_t = int;
+      ^^^^^

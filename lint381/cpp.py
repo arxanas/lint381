@@ -201,3 +201,21 @@ def catch_exception_by_value(tokens, *, match):
     if not any("&" in i.value for i in exception):
         yield Error(message="Catch exceptions by reference, not value",
                     tokens=exception)
+
+
+@linter.register
+@with_matched_tokens(start=match_regex("^using$"),
+                     end=match_regex("^=$"),
+                     length=3)
+def alias_names(tokens, *, match):
+    """Flag type aliases that don't adhere to the naming conventions."""
+    alias_token = match[1]
+    alias = alias_token.value
+
+    if not alias[0].isupper():
+        yield Error(message="Alias '{}' should be capitalized".format(alias),
+                    tokens=[alias_token])
+
+    if not alias.endswith("_t"):
+        yield Error(message="Alias '{}' should end with '_t'".format(alias),
+                    tokens=[alias_token])
