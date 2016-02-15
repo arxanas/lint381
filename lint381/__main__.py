@@ -7,19 +7,25 @@ from .c import linter as c_linter
 from .cpp import linter as cpp_linter
 
 
+_LINTERS = {
+    "c": c_linter,
+    "cpp": cpp_linter,
+}
+"""A map of language to linter."""
+
+
 @click.command()
 @click.argument("files", nargs=-1, type=click.File())
-@click.option("--lang", type=click.Choice(["c", "cpp"]), default="cpp")
+@click.option("--lang", type=click.Choice(_LINTERS.keys()), default="cpp")
 def main(files, lang):
     """Lint the files specified on the command-line."""
-    linter = {
-        "c": c_linter,
-        "cpp": cpp_linter,
-    }[lang]
+    linter = _LINTERS[lang]
 
     had_errors = False
     for file in files:
+        # The tokenizer doesn't handle tabs, so don't pass any in.
         code = file.read().replace("\t", " " * 4)
+
         errors = linter.lint(code)
         if errors:
             had_errors = True
@@ -57,10 +63,13 @@ def _print_tokens(error, code):
     lines = code.splitlines()
     line = lines[start.row]
 
-    if end.row != start.row:
-        underline_length = len(line) - start.column
-    else:
+    if start.row == end.row:
         underline_length = (end.column - start.column) + 1
+    else:
+        # It's possible for an error to span more than one line. The simplest
+        # example is a multi-line comment. In that case, only underline tokens
+        # on the first line.
+        underline_length = len(line) - start.column
     underline_string = "^" * underline_length
     underline_string = (" " * start.column) + underline_string
 

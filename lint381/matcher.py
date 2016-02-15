@@ -1,43 +1,61 @@
-"""Match parts of the token stream."""
+"""Tools to locally parse parts of the token stream."""
 import functools
 import re
 
 
-class with_matched_tokens:
-    """Pass the result of matching tokens to a linter."""
-
-    def __init__(self, **kwargs):
-        """Initialize to match a range of tokens.
-
-        :param dict kwargs: The keyword arguments to pass to `match_tokens`.
-        """
-        self._kwargs = kwargs
-
-    def __call__(self, func):
-        """Send the matched tokens to the decorated function.
-
-        The tokens are available in the `match` keyword argument.
-
-        :param function func: The linter function to wrap.
-        :returns function: The wrapped function.
-        """
-        @functools.wraps(func)
-        def wrapped(*args, **kwargs):
-            tokens = args[0]
-            for match in match_tokens(tokens, **self._kwargs):
-                kwargs["match"] = match
-                yield from func(*args, **kwargs)
-        return wrapped
-
-
 def match_tokens(tokens, *, start, end=None, lookahead=0, length=None):
-    """Find the specified pattern in the tokens.
+    r"""Try to find a pattern marked by `start` and `end` in the token list.
+
+    `start` and `end` are functions provided by the caller to specify if a
+    token could be the start or end of a subsequence. For example, consider
+    `start` and `end` defined as follows:
+
+        def start(token):
+            return token.value == "("
+
+        def end(token):
+            return token.value == ")"
+
+    We could use these to return a sequence of tokens including and in between
+    a set of parentheses.
+
+    `start` and `end` try to find the tightest set of matched tokens. Thus it
+    would match this:
+
+        ( foo + bar ( ) )
+                    ^^^
+
+    and not this:
+
+        ( foo + bar ( ) )
+        ^^^^^^^^^^^^^^^
+
+    which is typically the better behavior to have.
+
+    For convenience, helper functions such as `match_regex` are defined in this
+    module so that you don't have to make your own `start` and `end` functions.
+    Rather than define `start` and `end` as above, you could equivalently do
+    this:
+
+        match_tokens(tokens,
+                     start=match_regex(r"^\($"),
+                     end=match_regex(r"^\)$"))
+
+    You can additionally specify a `lookahead` value to return extra tokens
+    after the last matched token, or a `length` to specify that you only want
+    matches with a specific number of tokens.
 
     :param list tokens: A sequence of tokens to find matches in.
-    :param str start: The starting pattern to match a token value against.
-    :param str end: The ending pattern to match a token value against.
-    :param int lookahead: The number of extra tokens after the ending token to
-        return.
+    :param callable start: The function to match a starting token value
+        against. The token is matched if `start` returns `True` when applied to
+        it.
+    :param callable end: Optional. The function to match an ending token value
+        against. The token is matched if `end` returns `True` when applied to
+        it. If not provided, only the single token matched by `start` will be
+        returned.
+    :param int lookahead: A number of extra tokens after the ending token to
+        return. If there is a match, but there aren't enough additional
+        lookahead tokens to return, no match is yielded.
     :param int length: The number of tokens to match, exactly.
     :yields list: A subsequence of matched tokens.
     """
@@ -109,3 +127,52 @@ def match_type(type):
     def matcher(token):
         return token.type == type
     return matcher
+
+
+class with_matched_tokens:
+    """Decorator for a linter function that automatically runs `match_tokens`.
+
+    Since nearly all linting functions run `match_tokens`, it makes sense to
+    provide an easy way to do it.
+
+    This decorator modifies the function to be called on each match, rather
+    than just once with the token stream. The match is passed as a keyword
+    argument to the linting function.
+
+    So this:
+
+        @linter.register
+        def flag_something(tokens):
+            for match in match_tokens(start=foo, end=bar, ...):
+                ...
+
+    becomes this:
+
+        @linter.register
+        @with_matched_tokens(start=foo, end=bar, ...)
+        def flag_something(tokens, *, match):
+            ...
+    """
+
+    def __init__(self, **kwargs):
+        """Initialize the decorator with the arguments to `match_tokens`.
+
+        :param dict kwargs: The keyword arguments to pass to `match_tokens`.
+        """
+        self._kwargs = kwargs
+
+    def __call__(self, func):
+        """Wrap the function so that it is called with each match.
+
+        The matched tokens are available in the `match` keyword argument.
+
+        :param function func: The linter function to wrap.
+        :returns function: The wrapped function.
+        """
+        @functools.wraps(func)
+        def wrapped(*args, **kwargs):
+            tokens = args[0]
+            for match in match_tokens(tokens, **self._kwargs):
+                kwargs["match"] = match
+                yield from func(*args, **kwargs)
+        return wrapped
