@@ -79,7 +79,7 @@ std::vector<int>; /* ... */ Foo_t::iterator`).
 
 lint381 can now be used for inline style checking within emacs using flycheck. Download and follow the directions in [lint381.el](emacs/lint381.el) to set it up.
 
-![Example lint381 in emacs](emacs/emacs_example.png)
+![Example lint381 in emacs](media/emacs_example.png)
 
 # License
 
