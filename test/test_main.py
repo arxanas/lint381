@@ -1,4 +1,4 @@
-"""Test the main executable."""
+"""Test the main executable by running it on actual source files."""
 import os.path
 
 from click.testing import CliRunner
