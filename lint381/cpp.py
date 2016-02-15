@@ -3,7 +3,7 @@ import re
 
 from lint381 import c
 from .linter import Error, Linter
-from .matcher import match_regex, match_type, with_matched_tokens
+from .matcher import match_regex, match_tokens, match_type, with_matched_tokens
 
 linter = Linter()
 
@@ -219,3 +219,34 @@ def alias_names(tokens, *, match):
     if not alias.endswith("_t"):
         yield Error(message="Alias '{}' should end with '_t'".format(alias),
                     tokens=[alias_token])
+
+
+@linter.register
+def unused_using(tokens):
+    """Flag 'using std::foo' statements that aren't used."""
+    usings = []
+    for match in match_tokens(tokens,
+                              start=match_regex("^using$"),
+                              end=match_regex(";"),
+                              length=5):
+        std = match[1]
+        double_colon = match[2]
+        symbol = match[3]
+        if std.value == "std" and double_colon.value == "::":
+            usings.append(symbol)
+
+    unused_symbols = []
+    for symbol in usings:
+        for token in tokens:
+            # Obviously, the place where we define it doesn't count as a use.
+            if symbol is token:
+                continue
+
+            if symbol.value == token.value:
+                break
+        else:
+            unused_symbols.append(symbol)
+
+    for i in unused_symbols:
+        yield Error(message="Unused symbol '{}'".format(i.value),
+                    tokens=[i])

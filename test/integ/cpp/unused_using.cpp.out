@@ -1,0 +1,3 @@
+unused_using.cpp:3:12: error: Unused symbol 'cout'
+using std::cout;
+           ^^^^
