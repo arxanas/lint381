@@ -142,15 +142,17 @@ class with_matched_tokens:
     So this:
 
         @linter.register
-        def flag_something(tokens):
-            for match in match_tokens(start=foo, end=bar, ...):
+        def flag_something(source):
+            for match in match_tokens(source.tokens,
+                                      start=foo,
+                                      end=bar):
                 ...
 
     becomes this:
 
         @linter.register
         @with_matched_tokens(start=foo, end=bar, ...)
-        def flag_something(tokens, *, match):
+        def flag_something(source, *, match):
             ...
     """
 
@@ -171,8 +173,8 @@ class with_matched_tokens:
         """
         @functools.wraps(func)
         def wrapped(*args, **kwargs):
-            tokens = args[0]
-            for match in match_tokens(tokens, **self._kwargs):
+            source = args[0]
+            for match in match_tokens(source.tokens, **self._kwargs):
                 kwargs["match"] = match
                 yield from func(*args, **kwargs)
         return wrapped

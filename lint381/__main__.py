@@ -26,13 +26,13 @@ def main(files, lang):
         # The tokenizer doesn't handle tabs, so don't pass any in.
         code = file.read().replace("\t", " " * 4)
 
-        errors = linter.lint(code)
+        filename = os.path.basename(file.name)
+        errors = linter.lint(filename, code)
         if errors:
             had_errors = True
 
         for error in errors:
             location = error.tokens[0].start
-            filename = os.path.basename(file.name)
             _print_error(error, filename, location)
             _print_tokens(error, code)
 

@@ -17,6 +17,19 @@ import collections
 from .tokenizer import tokenize
 
 
+class SourceCode(collections.namedtuple("SourceCode", ["filename", "tokens"])):
+    """The tokenized source code of a file.
+
+    :ivar str filename: The name of the source file.
+    :ivar list tokens: The list of tokens in the file.
+    """
+
+    @property
+    def is_header_file(self):
+        """Whether or not this file is a header file."""
+        return self.filename.endswith(".h")
+
+
 Error = collections.namedtuple("Error", [
     "message",
     "tokens",
@@ -70,16 +83,18 @@ class Linter:
         self.linters.append(func)
         return func
 
-    def lint(self, code):
+    def lint(self, filename, code):
         """Find linting errors on the specified source code.
 
         :param str code: The source code as a string.
+        :param str filename: The name of the source file.
         :returns list: A list of `Error`s in the source code.
         """
         errors = []
 
-        tokens = tokenize(code)
+        source_code = SourceCode(filename=filename,
+                                 tokens=tokenize(code))
         for func in self.linters:
-            errors.extend(func(tokens))
+            errors.extend(func(source_code))
 
         return errors

@@ -1,4 +1,5 @@
 """Test the token matcher."""
+from lint381.linter import SourceCode
 from lint381.matcher import (
     match_regex,
     match_tokens,
@@ -85,7 +86,9 @@ foo bar
 
     @with_matched_tokens(start=match_regex("foo"),
                          end=match_regex("bar"))
-    def func(tokens, match):
+    def func(source, *, match):
         yield "baz"
 
-    assert list(func(tokenize(code))) == ["baz"]
+    source_code = SourceCode(filename="foo.cpp",
+                             tokens=tokenize(code))
+    assert list(func(source_code)) == ["baz"]

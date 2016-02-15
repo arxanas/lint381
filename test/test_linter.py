@@ -1,5 +1,5 @@
 """Test the linter tools."""
-from lint381.linter import Linter
+from lint381.linter import Linter, SourceCode
 
 
 def test_linter():
@@ -19,7 +19,16 @@ def test_linter():
     def bar(tokens):
         yield "bar"
 
-    assert list(linter.lint("code")) == [
+    assert list(linter.lint("code.cpp", "code")) == [
         "foo",
         "bar",
     ]
+
+
+def test_is_header_file():
+    """Ensure that we can distinguish header from source files."""
+    source = SourceCode(filename="foo.cpp", tokens=[])
+    assert not source.is_header_file
+
+    source = SourceCode(filename="foo.h", tokens=[])
+    assert source.is_header_file

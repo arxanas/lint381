@@ -12,7 +12,7 @@ linter = Linter()
 
 @linter.register
 @with_matched_tokens(start=match_regex("^(unsigned|float)$"))
-def prohibited_types(tokens, *, match):
+def prohibited_types(source, *, match):
     """Flag prohibited numeric types."""
     type = match[0]
     typename = type.value
@@ -23,7 +23,7 @@ def prohibited_types(tokens, *, match):
 
 @linter.register
 @with_matched_tokens(start=match_regex("^#define$"), lookahead=1)
-def underscore_define(tokens, *, match):
+def underscore_define(source, *, match):
     """Flag #defines that start with underscores."""
     define = match[1]
     macro = define.value
@@ -35,7 +35,7 @@ def underscore_define(tokens, *, match):
 
 @linter.register
 @with_matched_tokens(start=match_regex("^#define$"), lookahead=1)
-def uppercase_define(tokens, *, match):
+def uppercase_define(source, *, match):
     """Flag non-uppercase #defines."""
     define = match[1]
     macro = define.value
@@ -48,7 +48,7 @@ def uppercase_define(tokens, *, match):
 @linter.register
 @with_matched_tokens(start=match_regex("^(struct|enum|class)$"),
                      end=match_regex("^({|;)$"))
-def typename_capitalized(tokens, *, match):
+def typename_capitalized(source, *, match):
     """Flag type names that aren't capitalized."""
     type = match[0].value
     type_name = match[1].value
@@ -62,7 +62,7 @@ def typename_capitalized(tokens, *, match):
 @with_matched_tokens(start=match_regex("^enum$"),
                      end=match_type("identifier"),
                      length=2)
-def enums_end_with_e(tokens, *, match):
+def enums_end_with_e(source, *, match):
     """Flag enums that don't end with '_e'."""
     enum = match[-1]
     enum_name = enum.value
@@ -75,7 +75,7 @@ def enums_end_with_e(tokens, *, match):
 @linter.register
 @with_matched_tokens(start=match_regex("^typedef$"),
                      end=match_regex("^;$"))
-def typedefs_end_with_t(tokens, *, match):
+def typedefs_end_with_t(source, *, match):
     """Flag typedefs that don't end with '_t'."""
     typedef = match[-2]
     typedef_name = typedef.value
@@ -97,7 +97,7 @@ def typedefs_end_with_t(tokens, *, match):
 @linter.register
 @with_matched_tokens(start=match_regex("^(==|!=)$"),
                      end=match_regex("^\)$"))
-def comparison_to_null(tokens, *, match):
+def comparison_to_null(source, *, match):
     """Flag comparisons to null values."""
     operator = match[0]
     operand = match[1]
@@ -116,7 +116,7 @@ def comparison_to_null(tokens, *, match):
 @linter.register
 @with_matched_tokens(start=match_regex("^enum$"),
                      end=match_regex("^\}$"))
-def enum_members_all_caps(tokens, *, match):
+def enum_members_all_caps(source, *, match):
     """Flag enum values that aren't in all-caps."""
     enum_body = list(match_tokens(match,
                                   start=match_regex("^\{$"),
@@ -136,7 +136,7 @@ def enum_members_all_caps(tokens, *, match):
 @linter.register
 @with_matched_tokens(start=match_regex("^\($"),
                      end=match_regex("^malloc$"))
-def cast_malloc(tokens, *, match):
+def cast_malloc(source, *, match):
     """Flag casting the result of 'malloc'."""
     # Ensure that the open paren matches with a close paren right before the
     # malloc (i.e. is a cast).
@@ -152,7 +152,7 @@ def cast_malloc(tokens, *, match):
 @with_matched_tokens(start=match_regex("^const$"),
                      end=match_regex("^]$"),
                      length=5)
-def string_constant_array(tokens, *, match):
+def string_constant_array(source, *, match):
     """Flag string constants declared as an array instead of a pointer."""
     if match[1].value != "char":
         return

@@ -20,7 +20,7 @@ for linter_func in _IMPORTED_C_LINTERS:
 
 @linter.register
 @with_matched_tokens(start=match_type("comment"))
-def triple_asterisk_comment(tokens, *, match):
+def triple_asterisk_comment(source, *, match):
     """Flag instruction comments, which have three asterisks."""
     if "***" in match[0].value:
         yield Error(message="Remove triple-asterisk comments", tokens=match)
@@ -44,7 +44,7 @@ _DEPRECATED_TOKEN_REGEX = "^{}$".format(
 
 @linter.register
 @with_matched_tokens(start=match_regex(_DEPRECATED_TOKEN_REGEX))
-def deprecated_tokens(tokens, *, match):
+def deprecated_tokens(source, *, match):
     """Suggest alternatives to deprecated tokens such as `NULL`."""
     bad_token = match[0].value
     suggestion = _DEPRECATED_TOKEN_SUGGESTIONS[bad_token]
@@ -55,7 +55,7 @@ def deprecated_tokens(tokens, *, match):
 
 @linter.register
 @with_matched_tokens(start=match_regex("^memset|memmove|memcpy|exit$"))
-def prohibited_functions(tokens, *, match):
+def prohibited_functions(source, *, match):
     """Flag prohibited functions."""
     yield Error(message="Don't use '{}'".format(match[0].value),
                 tokens=match)
@@ -63,7 +63,7 @@ def prohibited_functions(tokens, *, match):
 
 @linter.register
 @with_matched_tokens(start=match_regex("^using$"), end=match_regex("^;$"))
-def alias_containers_not_iterators(tokens, *, match):
+def alias_containers_not_iterators(source, *, match):
     """Flag type-aliasing an iterator instead of its container.
 
     For example, flag this code:
@@ -89,10 +89,10 @@ def alias_containers_not_iterators(tokens, *, match):
 
 @linter.register
 @with_matched_tokens(start=match_regex("^#define$"))
-def use_const_not_define(tokens, *, match):
+def use_const_not_define(source, *, match):
     """Flag using `#define` to declare constants in C++."""
     define_token = match[0]
-    tokens_on_line = [i for i in tokens
+    tokens_on_line = [i for i in source.tokens
                       if i.start.row == define_token.start.row
                       if i.end.row == define_token.end.row]
 
@@ -119,7 +119,7 @@ def use_const_not_define(tokens, *, match):
 @with_matched_tokens(start=match_regex("^template$"),
                      end=match_regex("^class$"),
                      length=3)
-def use_typename_over_class(tokens, *, match):
+def use_typename_over_class(source, *, match):
     """Flag using class in template parameters."""
     template_var_type = match[-1]
     yield Error(message="Use 'typename' instead of 'class' "
@@ -131,7 +131,7 @@ def use_typename_over_class(tokens, *, match):
 @with_matched_tokens(start=match_regex("^while$"),
                      end=match_regex(r"^\)$"),
                      length=4)
-def loop_condition_boolean(tokens, *, match):
+def loop_condition_boolean(source, *, match):
     """Flag using a literal `0` or `1` in a loop condition.
 
     Instead use `true` or `false`.
@@ -154,7 +154,7 @@ def loop_condition_boolean(tokens, *, match):
 @with_matched_tokens(start=match_regex("^\.$"),
                      end=match_regex("^compare$"),
                      length=2)
-def string_compare(tokens, *, match):
+def string_compare(source, *, match):
     """Flag using string::compare.
 
     This just assumes that any instance of `.compare` can't be correct.
@@ -166,7 +166,7 @@ def string_compare(tokens, *, match):
 @with_matched_tokens(start=match_regex(r"^\.$"),
                      end=match_regex("^0$"),
                      length=6)
-def size_equal_to_zero(tokens, *, match):
+def size_equal_to_zero(source, *, match):
     """Flag comparing size to zero instead of calling `empty`."""
     values = [".", "size", "(", ")", "==", "0"]
     if any(i.value != j for i, j in zip(match, values)):
@@ -180,7 +180,7 @@ def size_equal_to_zero(tokens, *, match):
 @with_matched_tokens(start=match_regex("^;$"),
                      end=match_regex(r"^\)$"),
                      length=4)
-def post_increment_iterator(tokens, *, match):
+def post_increment_iterator(source, *, match):
     """Flag iterators that use post-increment instead of pre-increment."""
     if match[1].value == "it" and match[2].value == "++":
         yield Error(message="Use pre-increment instead of post-increment "
@@ -190,7 +190,7 @@ def post_increment_iterator(tokens, *, match):
 
 @linter.register
 @with_matched_tokens(start=match_regex("^catch$"), end=match_regex(r"^\)"))
-def catch_exception_by_value(tokens, *, match):
+def catch_exception_by_value(source, *, match):
     """Flag exceptions being caught by value instead of by reference."""
     exception = match[2:-1]
 
@@ -207,7 +207,7 @@ def catch_exception_by_value(tokens, *, match):
 @with_matched_tokens(start=match_regex("^using$"),
                      end=match_regex("^=$"),
                      length=3)
-def alias_names(tokens, *, match):
+def alias_names(source, *, match):
     """Flag type aliases that don't adhere to the naming conventions."""
     alias_token = match[1]
     alias = alias_token.value
@@ -222,10 +222,10 @@ def alias_names(tokens, *, match):
 
 
 @linter.register
-def unused_using(tokens):
+def unused_using(source):
     """Flag 'using std::foo' statements that aren't used."""
     usings = []
-    for match in match_tokens(tokens,
+    for match in match_tokens(source.tokens,
                               start=match_regex("^using$"),
                               end=match_regex(";"),
                               length=5):
@@ -237,7 +237,7 @@ def unused_using(tokens):
 
     unused_symbols = []
     for symbol in usings:
-        for token in tokens:
+        for token in source.tokens:
             # Obviously, the place where we define it doesn't count as a use.
             if symbol is token:
                 continue
