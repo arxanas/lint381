@@ -16,7 +16,10 @@ linter = Linter()
 def prohibited_unsigned_char(source, *, match):
     """Flag the usage of unsigned char
     """
-    if match[1].value != "char" and match[2].value != "char":
+    try:
+        if match[1].value != "char" and match[2].value != "char":
+            return
+    except:
         return
 
     yield Error("sizeof(char) should not be used as it is defined by the C "\
