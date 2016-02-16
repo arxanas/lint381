@@ -11,25 +11,17 @@ linter = Linter()
 
 
 @linter.register
-@with_matched_tokens(start=match_regex("^sizeof$"),
-        end=match_regex("^char$"))
+@with_matched_tokens(start=match_regex("^sizeof$"), end=match_regex("^char$"))
 def prohibited_unsigned_char(source, *, match):
-    """Flag the usage of unsigned char
-    """
-    try:
-        if match[1].value != "char" and match[2].value != "char":
-            return
-    except:
-        return
-
-    yield Error("sizeof(char) should not be used as it is defined by the C "\
-            "standard to be equal to 1", tokens = [match[0]])
+    """sizeof char should be avoided as the C standard defines it to be a 1."""
+    yield Error("sizeof(char) should not be used as it is defined by the C "
+                "standard to be equal to 1", tokens=[match[0]])
 
 
 @linter.register
 @with_matched_tokens(start=match_regex("^(unsigned|float)$"))
 def prohibited_types(source, *, match):
-    """Flag prohibited numeric types."""
+    """flag prohibited numeric types."""
     type = match[0]
     typename = type.value
     yield Error(message="Prohibited type '{}'"

@@ -1,3 +1,3 @@
-sizeof(char)
-sizeof char
-cout << sizeof(char) << endl;
+sizeof(char);
+sizeof char;
+cout << sizeof(int) << endl;
