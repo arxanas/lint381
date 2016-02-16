@@ -11,17 +11,18 @@ linter = Linter()
 
 
 @linter.register
-@with_matched_tokens(start=match_regex("^sizeof$"), end=match_regex("^char$"))
-def prohibited_unsigned_char(source, *, match):
+@with_matched_tokens(start=match_regex("^sizeof$"),
+                     end=match_regex("^char$"), lookahead=1)
+def sizeof_char(source, *, match):
     """Flag sizeof(char) as it defined to be 1 and is redundant."""
-    error_message = "sizeof(char) should not be used as it is defined by the "\
-                    "C standard to be equal to 1"
+    error_message = "sizeof(char) is redundant as it is defined to be 1"
 
-    if match[1].value == "char":
+    if match[1].value == "char" and match[2].value not in ["(", "[", "*"]:
         yield Error(error_message, tokens=[match[0], match[1]])
-    elif (match[2].value == "char" and match[1].value == "("):
+    elif (match[1].value == "(" and match[2].value == "char" and
+            match[3].value == ")"):
         yield Error(error_message, tokens=[match[0], match[1],
-                    match[2]])
+                    match[2], match[3]])
 
 
 @linter.register

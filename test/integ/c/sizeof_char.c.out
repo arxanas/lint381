@@ -1,9 +1,9 @@
-sizeof_char.c:1:1: error: sizeof(char) should not be used as it is defined by the C standard to be equal to 1
+sizeof_char.c:1:1: error: sizeof(char) is redundant as it is defined to be 1
 sizeof(char);
-^^^^^^^^^^^
-sizeof_char.c:2:1: error: sizeof(char) should not be used as it is defined by the C standard to be equal to 1
+^^^^^^^^^^^^
+sizeof_char.c:2:1: error: sizeof(char) is redundant as it is defined to be 1
 sizeof char;
 ^^^^^^^^^^^
-sizeof_char.c:6:1: error: sizeof(char) should not be used as it is defined by the C standard to be equal to 1
+sizeof_char.c:6:1: error: sizeof(char) is redundant as it is defined to be 1
 sizeof char;
 ^^^^^^^^^^^
