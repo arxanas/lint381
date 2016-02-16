@@ -1,3 +1,7 @@
 sizeof(char);
 sizeof char;
-cout << sizeof(int) << endl;
+sizeof(int);
+char a;
+
+sizeof char;
+sizeof int;
