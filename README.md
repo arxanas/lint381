@@ -51,6 +51,7 @@ The C linter flags the following:
   * Enum members that aren't all-caps.
   * Casting the result of `malloc` (such as `foo = (char*) malloc(...)`).
   * Defining string constants as an array instead of a pointer.
+  * Use of `sizeof(char)`.
 
 ## C++ checks
 

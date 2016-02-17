@@ -11,6 +11,21 @@ linter = Linter()
 
 
 @linter.register
+@with_matched_tokens(start=match_regex("^sizeof$"),
+                     end=match_regex("^char$"), lookahead=1)
+def sizeof_char(source, *, match):
+    """Flag sizeof(char) as it defined to be 1 and is redundant."""
+    error_message = "sizeof(char) is redundant as it is defined to be 1"
+
+    if match[1].value == "char" and match[2].value not in ["(", "[", "*"]:
+        yield Error(error_message, tokens=[match[0], match[1]])
+    elif (match[1].value == "(" and match[2].value == "char" and
+            match[3].value == ")"):
+        yield Error(error_message, tokens=[match[0], match[1],
+                    match[2], match[3]])
+
+
+@linter.register
 @with_matched_tokens(start=match_regex("^(unsigned|float)$"))
 def prohibited_types(source, *, match):
     """Flag prohibited numeric types."""

@@ -1,0 +1,9 @@
+sizeof_char.c:1:1: error: sizeof(char) is redundant as it is defined to be 1
+sizeof(char);
+^^^^^^^^^^^^
+sizeof_char.c:2:1: error: sizeof(char) is redundant as it is defined to be 1
+sizeof char;
+^^^^^^^^^^^
+sizeof_char.c:6:1: error: sizeof(char) is redundant as it is defined to be 1
+sizeof char;
+^^^^^^^^^^^
