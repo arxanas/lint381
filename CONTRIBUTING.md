@@ -56,11 +56,13 @@ install the `lint381` executable in the virtualenv:
 
 Here is how `lint381` works:
 
-  1) Convert each source file into a list of tokens. See `tokenizer.py` for more
+  1. Convert each source file into a list of tokens. See `tokenizer.py` for more
 information on what a token is.
-  2) Run each linting function on each source file's list of tokens. Collect all
+
+  2. Run each linting function on each source file's list of tokens. Collect all
 the generated linting errors.
-  3) Print out all the collected error messages.
+
+  3. Print out all the collected error messages.
 
 You can find the linting functions in `c.py` and `cpp.py`. If you want a
 function to apply to both C and C++, write it in `c.py` and modify the list of
