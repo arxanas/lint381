@@ -1,0 +1,6 @@
+user_includes_first.c:5:10: error: User include 'foo.h' should be before system includes
+#include "foo.h"
+         ^^^^^^^
+user_includes_first.c:6:10: error: User include 'bar.h' should be before system includes
+#include "bar.h"
+         ^^^^^^^

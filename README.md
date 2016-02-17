@@ -7,6 +7,8 @@ can be found here:
 
   * [C coding standard](http://umich.edu/~eecs381/handouts/C_Coding_Standards.pdf)
   * [C++ coding standard](http://umich.edu/~eecs381/handouts/C++_Coding_Standards.pdf)
+  * [C header file guidelines](http://umich.edu/~eecs381/handouts/CHeaderFileGuidelines.pdf)
+  * [C++ header file guidelines](http://umich.edu/~eecs381/handouts/CppHeaderFileGuidelines.pdf)
 
 Here's `lint381` in action:
 
@@ -57,6 +59,7 @@ The C linter flags the following:
   * Casting the result of `malloc` (such as `foo = (char*) malloc(...)`).
   * Defining string constants as an array instead of a pointer.
   * Use of `sizeof(char)`.
+  * Putting user includes after system includes.
 
 ## C++ checks
 
