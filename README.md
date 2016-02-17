@@ -12,6 +12,11 @@ Here's `lint381` in action:
 
 ![Example lint381 usage](media/example.png)
 
+# Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to contribute to
+the project. Patches welcome!
+
 # Usage
 
 `lint381` requires Python 3, so you may want to install it inside a `virtualenv`
