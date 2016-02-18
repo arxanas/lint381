@@ -60,6 +60,7 @@ The C linter flags the following:
   * Defining string constants as an array instead of a pointer.
   * Use of `sizeof(char)`.
   * Putting user includes after system includes.
+  * Not including the module header as the first include in the file.
 
 ## C++ checks
 
