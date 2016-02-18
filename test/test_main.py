@@ -15,10 +15,11 @@ def source_code_files(language):
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
     integ_test_dir = os.path.join(script_dir, "integ", language)
+    extensions = [".{}".format(language), ".h"]
 
     tests = []
     for i in os.listdir(integ_test_dir):
-        if not i.endswith(".{}".format(language)):
+        if not any(i.endswith(ext) for ext in extensions):
             continue
 
         input_filename = os.path.join(integ_test_dir, i)

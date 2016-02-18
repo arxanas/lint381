@@ -1,4 +1,6 @@
 """C linters."""
+import os.path
+
 from .linter import Error, Linter
 from .matcher import (
     match_regex,
@@ -6,6 +8,7 @@ from .matcher import (
     match_type,
     with_matched_tokens,
 )
+from .matcher.include import with_includes
 
 linter = Linter()
 
@@ -181,7 +184,8 @@ def string_constant_array(source, *, match):
 
 
 @linter.register
-def user_includes_before_system_includes(source):
+@with_includes
+def user_includes_before_system_includes(source, *, includes):
     """Flag putting user includes after a system include.
 
     That is, this is invalid:
@@ -194,46 +198,40 @@ def user_includes_before_system_includes(source):
         #include "foo.h"
         #include <stdio.h>
     """
-    includes = _find_includes(source.tokens)
     started_system_includes = False
     for include in includes:
-        # For system includes, the next tokens are '<', 'stdio', '.', 'h', '>'.
-        # But for a user include, the next token is a single string token.  So
-        # we look at the first character of the next token to handle both of
-        # these cases.
-        include_type = include[1].value[0]
-        assert include_type in ["<", '"']
-
-        if include_type == "<":
+        if include.is_system_include:
             started_system_includes = True
-        elif include_type == '"' and started_system_includes:
+        elif started_system_includes:
+            # It is not a system include, but we have already seen system
+            # includes.
             yield Error(message="User include '{}' should "
                                 "be before system includes"
-                                .format(include[1].value.strip('\"')),
-                        tokens=include[1:])
+                                .format(include.include_file),
+                        tokens=include.tokens[1:])
 
 
-def _find_includes(tokens):
-    """Find all of the #includes directives in a source file.
+@linter.register
+@with_includes
+def module_header_not_first(source, *, includes):
+    """Flag including other headers before the header for this module.
 
-    :param list tokens: The list of tokens in the source code.
-    :yields list: A list of tokens representing the tokens in an include, e.g.
-        ['#include', '<', 'stdio', '.', 'h', '>']. These are returned in the
-        same order that they appear in the file.
+    For example, this is invalid in a file called 'foo.c':
+
+        #include "something.h"
+        #include "foo.h"
+
+    It should be this:
+
+        #include "foo.h"
+        #include "something.h"
     """
-    for i, token in enumerate(tokens[:-1]):
-        if token.value != "#include":
-            continue
+    source_basename, _ = os.path.splitext(source.filename)
 
-        if tokens[i + 1].type == "string":
-            yield tokens[i:i + 2]
-        else:
-            angle_include = match_tokens(tokens[i + 1:],
-                                         start=match_regex("^<$"),
-                                         end=match_regex("^>$"))
-            try:
-                angle_include = next(angle_include)
-            except StopIteration:
-                continue
-
-            yield [token] + angle_include
+    for include in includes[1:]:
+        basename, ext = os.path.splitext(include.include_file)
+        if basename == source_basename and ext == ".h":
+            yield Error(message="Header '{}' should be first include in '{}'"
+                                .format(include.include_file,
+                                        source.filename),
+                        tokens=include.tokens[1:])

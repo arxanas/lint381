@@ -1,4 +1,4 @@
-"""Tools to locally parse parts of the token stream."""
+"""Basic tools to locally parse parts of the token stream."""
 import functools
 import re
 
