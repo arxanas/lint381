@@ -62,10 +62,6 @@ def match_tokens(tokens, *, start, end=None, lookahead=0, length=None):
     if end is None:
         end = start
 
-    if length is not None:
-        assert length > 0
-        assert not lookahead, "Lookahead not implemented for length != 0"
-
     i = 0
     while i < len(tokens):
         start_token = tokens[i]
@@ -82,8 +78,9 @@ def match_tokens(tokens, *, start, end=None, lookahead=0, length=None):
                     # match of the specified length anymore.
                     break
 
-                if end(end_token):
-                    yield tokens[i:j + 1]
+                end_index = j + lookahead
+                if end(end_token) and end_index < len(tokens):
+                    yield tokens[i:end_index + 1]
             else:
                 # Scan ahead for the matching end token.
                 for j, end_token in enumerate(tokens[i:], i):

@@ -154,13 +154,17 @@ def loop_condition_boolean(source, *, match):
 @linter.register
 @with_matched_tokens(start=match_regex("^\.$"),
                      end=match_regex("^compare$"),
-                     length=2)
+                     length=2,
+                     lookahead=1)
 def string_compare(source, *, match):
     """Flag using string::compare.
 
     This just assumes that any instance of `.compare` can't be correct.
     """
-    yield Error(message="Don't use 'string::compare'", tokens=match)
+    dot, compare, open_paren = match
+    if open_paren.value == "(":
+        yield Error(message="Don't use 'string::compare'",
+                    tokens=[dot, compare])
 
 
 @linter.register
