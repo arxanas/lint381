@@ -1,0 +1,3 @@
+module_header_not_first.cpp:3:10: error: Header 'module_header_not_first.h' should be first include in 'module_header_not_first.cpp'
+#include "module_header_not_first.h"
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -14,6 +14,8 @@ _IMPORTED_C_LINTERS = [
     "typename_capitalized",
     "string_constant_array",
     "sizeof_char",
+    "user_includes_before_system_includes",
+    "module_header_not_first",
 ]
 for linter_func in _IMPORTED_C_LINTERS:
     linter.register(getattr(c, linter_func))
