@@ -1,5 +1,5 @@
 """Install the `lint381` script."""
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 setup(
@@ -10,7 +10,7 @@ setup(
     description="C and C++ linter for EECS 381.",
     url="https://github.com/arxanas/lint381",
 
-    packages=["lint381"],
+    packages=find_packages(),
     entry_points="""
     [console_scripts]
     lint381=lint381.__main__:main
