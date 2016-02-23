@@ -179,7 +179,7 @@ def size_equal_to_zero(source, *, match):
     if any(i.value != j for i, j in zip(match, values)):
         return
 
-    yield Error(message="Use 'empty' instead of comparing 'size()' with '0'",
+    yield Error(message="Use 'empty()' instead of comparing 'size()' with '0'",
                 tokens=match)
 
 
