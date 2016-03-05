@@ -85,6 +85,9 @@ std::vector<int>; /* ... */ Foo_t::iterator`).
   * Use of post-increment instead of pre-increment for iterators.
   * Catching exceptions by value instead of by reference.
   * Unused `using`-statements, such as `using std::cout;`.
+  * Using `enum`s instead of `enum class`es.
+  * Naming `enum class`es with a trailing `_e`, which is the convention for C but not C++.
+  * Uppercase `enum class` members, which is unnecessary because they are scoped.
 
 ## emacs
 
