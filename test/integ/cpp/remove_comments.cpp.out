@@ -1,0 +1,9 @@
+remove_comments.cpp:2:1: error: Remove triple-asterisk comments
+// *** bad ***
+^^^^^^^^^^^^^^
+remove_comments.cpp:7:1: error: Remove triple-asterisk comments
+/* *** bad *** */
+^^^^^^^^^^^^^^^^^
+remove_comments.cpp:9:1: error: Remove this comment
+/* You should delete this comment. */
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

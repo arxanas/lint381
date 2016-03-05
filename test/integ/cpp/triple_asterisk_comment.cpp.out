@@ -1,6 +1,0 @@
-triple_asterisk_comment.cpp:2:1: error: Remove triple-asterisk comments
-// *** bad ***
-^^^^^^^^^^^^^^
-triple_asterisk_comment.cpp:7:1: error: Remove triple-asterisk comments
-/* *** bad *** */
-^^^^^^^^^^^^^^^^^

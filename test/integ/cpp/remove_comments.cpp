@@ -5,3 +5,5 @@
 foo
 
 /* *** bad *** */
+
+/* You should delete this comment. */

@@ -23,10 +23,15 @@ for linter_func in _IMPORTED_C_LINTERS:
 
 @linter.register
 @with_matched_tokens(start=match_type("comment"))
-def triple_asterisk_comment(source, *, match):
-    """Flag instruction comments, which have three asterisks."""
-    if "***" in match[0].value:
+def remove_comments(source, *, match):
+    """Flag comments which should be deleted."""
+    comment_text = match[0].value
+
+    if "***" in comment_text:
         yield Error(message="Remove triple-asterisk comments", tokens=match)
+
+    if "delete this comment" in comment_text:
+        yield Error(message="Remove this comment", tokens=match)
 
 
 _DEPRECATED_TOKEN_SUGGESTIONS = {
