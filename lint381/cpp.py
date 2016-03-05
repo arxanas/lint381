@@ -295,3 +295,36 @@ def enum_class_name(source, *, match):
         yield Error(message="Enum class name '{}' shouldn't end with '_e'"
                             .format(name),
                     tokens=[name_token])
+
+
+@linter.register
+@with_matched_tokens(start=match_regex("^enum$"),
+                     end=match_regex(r"^\}$"))
+def enum_class_members_not_uppercase(source, *, match):
+    """Flag putting enum class members in all-caps."""
+    try:
+        # A member is followed by either a comma or a close brace, so keep the
+        # close brace in `members` so that we can use the close brace to detect
+        # actual members.
+        enum, class_, name, open_brace, *members = match
+    except ValueError:  # pragma: no cover
+        return
+
+    expected_values = [
+        (enum, "enum"),
+        (class_, "class"),
+        (open_brace, "{"),
+    ]
+    if any(i.value != j for i, j in expected_values):
+        return
+
+    for match in match_tokens(members,
+                              start=match_type("identifier"),
+                              end=match_regex(r",|}")):
+        member = match[0]
+        member_name = member.value
+        if member_name.isupper():
+            yield Error(message="Enum class member '{}' "
+                                "should not be uppercase"
+                                .format(member_name),
+                        tokens=[member])

@@ -1,0 +1,6 @@
+enum_class_members_not_uppercase.cpp:2:5: error: Enum class member 'FOO' should not be uppercase
+    FOO,
+    ^^^
+enum_class_members_not_uppercase.cpp:4:5: error: Enum class member 'BAZ' should not be uppercase
+    BAZ /*QUX*/
+    ^^^
