@@ -31,6 +31,10 @@ def main(files, lang):
         if errors:
             had_errors = True
 
+        # Display errors in the order that their tokens appear, rather than in
+        # the order that we found the errors.
+        errors.sort(key=lambda error: error.tokens[0].start)
+
         for error in errors:
             location = error.tokens[0].start
             _print_error(error, filename, location)
