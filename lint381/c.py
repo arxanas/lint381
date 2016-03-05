@@ -73,7 +73,7 @@ def typename_capitalized(source, *, match):
     type_name_token = match[1]
     type_name = type_name_token.value
 
-    # Don't flag enum-classes as regular classes. Handle enum-classes in a
+    # Don't flag enum classes as regular classes. Handle enum classes in a
     # separate check.
     if type == "class":
         index = source.tokens.index(type_token)
@@ -95,7 +95,7 @@ def enum_names(source, *, match):
 
     We don't fold this into the check in `typename_capitalized` because we
     don't want to import any enum-related functions into the C++ linter
-    (because we recommend enum-classes instead).
+    (because we recommend enum classes instead).
     """
     name_token = match[1]
     name = name_token.value

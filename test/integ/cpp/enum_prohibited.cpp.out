@@ -1,0 +1,3 @@
+enum_prohibited.cpp:1:1: error: Enum 'foo' should be an enum class
+enum foo {};
+^^^^

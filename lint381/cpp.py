@@ -267,6 +267,19 @@ def unused_using(source):
 @linter.register
 @with_matched_tokens(start=match_regex("^enum$"),
                      end=match_regex(r"^\{$"),
+                     length=3)
+def raw_enum(source, *, match):
+    """Flag using raw enums in C++ code."""
+    enum, name_token, brace = match
+    name = name_token.value
+    yield Error(message="Enum '{}' should be an enum class"
+                        .format(name),
+                tokens=[enum])
+
+
+@linter.register
+@with_matched_tokens(start=match_regex("^enum$"),
+                     end=match_regex(r"^\{$"),
                      length=4)
 def enum_class_name(source, *, match):
     """Flag enum classes with illegal names."""
