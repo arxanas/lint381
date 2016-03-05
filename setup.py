@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="lint381",
-    version="1.3.4",
+    version="1.3.5",
     author="Waleed Khan",
     author_email="wkhan@umich.edu",
     description="C and C++ linter for EECS 381.",
