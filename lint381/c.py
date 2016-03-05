@@ -64,30 +64,50 @@ def uppercase_define(source, *, match):
 
 
 @linter.register
-@with_matched_tokens(start=match_regex("^(struct|enum|class)$"),
+@with_matched_tokens(start=match_regex("^(struct|class)$"),
                      end=match_regex("^({|;)$"))
 def typename_capitalized(source, *, match):
     """Flag type names that aren't capitalized."""
-    type = match[0].value
-    type_name = match[1].value
+    type_token = match[0]
+    type = type_token.value
+    type_name_token = match[1]
+    type_name = type_name_token.value
+
+    # Don't flag enum-classes as regular classes. Handle enum-classes in a
+    # separate check.
+    if type == "class":
+        index = source.tokens.index(type_token)
+        if index > 0 and source.tokens[index - 1].value == "enum":
+            return
+
     if type_name[0].islower():
         yield Error(message="{} name '{}' should be capitalized"
                             .format(type.capitalize(), type_name),
-                    tokens=[match[1]])
+                    tokens=[type_name_token])
 
 
 @linter.register
 @with_matched_tokens(start=match_regex("^enum$"),
                      end=match_type("identifier"),
                      length=2)
-def enums_end_with_e(source, *, match):
-    """Flag enums that don't end with '_e'."""
-    enum = match[-1]
-    enum_name = enum.value
-    if not enum_name.endswith("_e"):
-        yield Error(message="Enum '{}' should end with '_e'"
-                            .format(enum_name),
-                    tokens=[enum])
+def enum_names(source, *, match):
+    """Flag enums that are not capitalized or don't end with '_e'.
+
+    We don't fold this into the check in `typename_capitalized` because we
+    don't want to import any enum-related functions into the C++ linter
+    (because we recommend enum-classes instead).
+    """
+    name_token = match[1]
+    name = name_token.value
+
+    if not name[0].isupper():
+        yield Error(message="Enum name '{}' should be capitalized"
+                            .format(name),
+                    tokens=[name_token])
+
+    if not name.endswith("_e"):
+        yield Error(message="Enum name '{}' should end with '_e'".format(name),
+                    tokens=[name_token])
 
 
 @linter.register

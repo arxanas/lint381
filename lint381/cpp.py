@@ -262,3 +262,23 @@ def unused_using(source):
     for i in unused_symbols:
         yield Error(message="Unused symbol '{}'".format(i.value),
                     tokens=[i])
+
+
+@linter.register
+@with_matched_tokens(start=match_regex("^enum$"),
+                     end=match_regex(r"^\{$"),
+                     length=4)
+def enum_class_name(source, *, match):
+    """Flag enum classes with illegal names."""
+    enum, class_, name_token, brace = match
+    name = name_token.value
+
+    if not name[0].isupper():
+        yield Error(message="Enum class name '{}' should be capitalized"
+                            .format(name),
+                    tokens=[name_token])
+
+    if name.endswith("_e"):
+        yield Error(message="Enum class name '{}' shouldn't end with '_e'"
+                            .format(name),
+                    tokens=[name_token])

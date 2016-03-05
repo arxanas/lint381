@@ -1,0 +1,6 @@
+enum_class_name.cpp:1:12: error: Enum class name 'bar' should be capitalized
+enum class bar {};
+           ^^^
+enum_class_name.cpp:3:12: error: Enum class name 'Bar_e' shouldn't end with '_e'
+enum class Bar_e {};
+           ^^^^^
