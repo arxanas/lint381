@@ -41,8 +41,7 @@ def remove_comments(source, *, match):
     # are not asterisks.
     if re.search(r"(^|[^*])\*\*\*([^*]|$)", comment_text):
         yield Error(message="Remove triple-asterisk comments", tokens=match)
-
-    if "delete this comment" in comment_text:
+    elif "delete this comment" in comment_text:
         yield Error(message="Remove this comment", tokens=match)
 
 
