@@ -27,7 +27,19 @@ def remove_comments(source, *, match):
     """Flag comments which should be deleted."""
     comment_text = match[0].value
 
-    if "***" in comment_text:
+    # Only match triple-asterisks that are words on their own; that is, don't
+    # match
+    #
+    #     /******* HEADER *******/
+    #
+    # But do match
+    #
+    #     /*** do this thing ***/
+    #
+    # We can't use `\b` to denote a word boundary because `***` is not a word.
+    # Instead, we check to make sure that the surrounding characters, if any,
+    # are not asterisks.
+    if re.search(r"(^|[^*])\*\*\*([^*]|$)", comment_text):
         yield Error(message="Remove triple-asterisk comments", tokens=match)
 
     if "delete this comment" in comment_text:
