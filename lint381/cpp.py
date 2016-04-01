@@ -235,6 +235,10 @@ def alias_names(source, *, match):
     alias_token = match[1]
     alias = alias_token.value
 
+    # Name mandated by the C++ standard library for heterogeneous lookup.
+    if alias == "is_transparent":
+        return
+
     if not alias[0].isupper():
         yield Error(message="Alias '{}' should be capitalized".format(alias),
                     tokens=[alias_token])
