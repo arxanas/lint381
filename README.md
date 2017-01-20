@@ -95,6 +95,12 @@ lint381 can now be used for inline style checking within emacs using flycheck. D
 
 ![Example lint381 in emacs](media/emacs_example.png)
 
+## vim
+
+lint381 can also be used for inline style checking within vim using Syntastic. Download and follow the directions in [lint381.vim](vim/cpp/lint381.vim) to set it up.
+
+![Example lint381 in vim](media/vim_example.png)
+
 # License
 
 `lint381` is licensed under GPLv3.
