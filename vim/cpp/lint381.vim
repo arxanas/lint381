@@ -20,7 +20,7 @@
     " Of course, precede 'lint381' with any other linters you may wish to use, e.g.:
       " let g:syntastic_cpp_checkers = ['cppcheck', 'lint381']
 
-  " Note that if you have multiple checkers enabled, the defualt behavior of Syntastic
+  " Note that if you have multiple checkers enabled, the default behavior of Syntastic
   " is to run them in sequence, continuing with the next checker ONLY once the previous
   " checker returns no errors. 
   " To tell Syntastic to always run all checkers, add this to your vimrc:
